@@ -1,0 +1,118 @@
+<svg width="1200" height="760" viewBox="0 0 1200 760" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Segoe UI',sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#059669"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="760" fill="#ffffff"/>
+
+  <!-- Section label: Pulse -->
+  <rect x="30" y="24" width="10" height="150" fill="#2563eb" rx="2"/>
+  <text x="52" y="50" font-size="13" font-weight="700" fill="#2563eb" letter-spacing="1">OKTO PULSE — GOVERNS WHAT GETS BUILT</text>
+
+  <!-- Pulse pipeline nodes -->
+  <g font-size="14" font-weight="600">
+    <!-- Ideation -->
+    <rect x="52" y="66" width="150" height="56" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="127" y="90" text-anchor="middle" fill="#1e3a8a">Ideation</text>
+    <text x="127" y="108" text-anchor="middle" font-size="11" font-weight="400" fill="#3b82f6">ambiguity Q&amp;A</text>
+
+    <!-- Refinement -->
+    <rect x="232" y="66" width="150" height="56" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="307" y="90" text-anchor="middle" fill="#1e3a8a">Refinement</text>
+    <text x="307" y="108" text-anchor="middle" font-size="11" font-weight="400" fill="#3b82f6">real codebase read</text>
+
+    <!-- Spec -->
+    <rect x="412" y="66" width="150" height="56" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="487" y="90" text-anchor="middle" fill="#1e3a8a">Spec</text>
+    <text x="487" y="108" text-anchor="middle" font-size="11" font-weight="400" fill="#3b82f6">5-dim validation gate</text>
+
+    <!-- Sprint -->
+    <rect x="592" y="66" width="150" height="56" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="667" y="90" text-anchor="middle" fill="#1e3a8a">Sprint</text>
+    <text x="667" y="108" text-anchor="middle" font-size="11" font-weight="400" fill="#3b82f6">4 dependency-linked cards</text>
+  </g>
+
+  <path d="M202 94 L232 94" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <path d="M382 94 L412 94" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <path d="M562 94 L592 94" stroke="#2563eb" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- Cards row -->
+  <path d="M667 122 L667 175 L272 175 L272 210" stroke="#2563eb" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+  <path d="M667 122 L667 210" stroke="#2563eb" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+
+  <g font-size="13" font-weight="600">
+    <rect x="182" y="210" width="180" height="56" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="272" y="234" text-anchor="middle" fill="#1e3a8a">Backend Card</text>
+    <text x="272" y="252" text-anchor="middle" font-size="11" font-weight="400" fill="#3b82f6">apps/api</text>
+
+    <rect x="587" y="210" width="180" height="56" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="677" y="234" text-anchor="middle" fill="#1e3a8a">Frontend Card</text>
+    <text x="677" y="252" text-anchor="middle" font-size="11" font-weight="400" fill="#3b82f6">apps/web</text>
+  </g>
+
+  <!-- depends-on arrow between cards -->
+  <path d="M362 238 L587 238" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+  <text x="474" y="228" text-anchor="middle" font-size="11" fill="#64748b">depends on</text>
+
+  <!-- Section label: Nexus -->
+  <rect x="30" y="330" width="10" height="150" fill="#059669" rx="2"/>
+  <text x="52" y="356" font-size="13" font-weight="700" fill="#059669" letter-spacing="1">OKTO NEXUS — GOVERNS WHO ACTS, WHEN</text>
+
+  <g font-size="14" font-weight="600">
+    <rect x="52" y="372" width="200" height="56" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+    <text x="152" y="396" text-anchor="middle" fill="#065f46">backend-agent</text>
+    <text x="152" y="414" text-anchor="middle" font-size="11" font-weight="400" fill="#059669">handoff_create</text>
+
+    <rect x="322" y="372" width="200" height="56" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+    <text x="422" y="396" text-anchor="middle" fill="#065f46">Nexus event log</text>
+    <text x="422" y="414" text-anchor="middle" font-size="11" font-weight="400" fill="#059669">create → claim → complete</text>
+
+    <rect x="592" y="372" width="200" height="56" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+    <text x="692" y="396" text-anchor="middle" fill="#065f46">frontend-agent</text>
+    <text x="692" y="414" text-anchor="middle" font-size="11" font-weight="400" fill="#059669">handoff_claim / _complete</text>
+  </g>
+
+  <path d="M252 400 L322 400" stroke="#059669" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <path d="M522 400 L592 400" stroke="#059669" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- connectors from cards down to nexus row -->
+  <path d="M272 266 L272 300 L152 300 L152 372" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-dasharray="4,3"/>
+  <path d="M677 266 L677 300 L692 300 L692 372" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-dasharray="4,3"/>
+
+  <!-- Section label: Plane -->
+  <rect x="30" y="524" width="10" height="150" fill="#6d28d9" rx="2"/>
+  <text x="52" y="550" font-size="13" font-weight="700" fill="#6d28d9" letter-spacing="1">FORKED CODEBASE — plane/</text>
+
+  <g font-size="13" font-weight="600">
+    <rect x="52" y="566" width="280" height="80" rx="10" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+    <text x="192" y="592" text-anchor="middle" fill="#4c1d95">ExportIssuesEndpoint</text>
+    <text x="192" y="610" text-anchor="middle" font-size="11" font-weight="400" fill="#7c3aed">issue_export_task (Celery)</text>
+    <text x="192" y="628" text-anchor="middle" font-size="11" font-weight="400" fill="#7c3aed">rich_filters applied here</text>
+
+    <rect x="392" y="566" width="280" height="80" rx="10" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+    <text x="532" y="592" text-anchor="middle" fill="#4c1d95">ExportCsvAction</text>
+    <text x="532" y="610" text-anchor="middle" font-size="11" font-weight="400" fill="#7c3aed">IssuesHeader toolbar</text>
+    <text x="532" y="628" text-anchor="middle" font-size="11" font-weight="400" fill="#7c3aed">sends the view's live richFilters</text>
+
+    <rect x="732" y="566" width="280" height="80" rx="10" fill="#f5f3ff" stroke="#6d28d9" stroke-width="1.5"/>
+    <text x="872" y="592" text-anchor="middle" fill="#4c1d95">Presigned export URL</text>
+    <text x="872" y="610" text-anchor="middle" font-size="11" font-weight="400" fill="#7c3aed">S3 / MinIO, 7-day expiry</text>
+    <text x="872" y="628" text-anchor="middle" font-size="11" font-weight="400" fill="#7c3aed">polled via ExporterHistory</text>
+  </g>
+
+  <path d="M192 646 L192 665 L532 665 L532 646" stroke="#94a3b8" stroke-width="1.5" fill="none"/>
+  <path d="M532 646 L532 665 L872 665 L872 646" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <path d="M272 428 L272 480 L192 480 L192 566" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-dasharray="4,3"/>
+  <path d="M692 428 L692 480 L532 480 L532 566" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-dasharray="4,3"/>
+
+  <text x="52" y="720" font-size="11" fill="#94a3b8">Solid arrows = direct call/produces. Dashed arrows = governs / traces to.</text>
+</svg>

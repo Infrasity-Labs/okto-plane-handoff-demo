@@ -39,7 +39,8 @@ truncation noted:
 }
 ```
 
-The `notes` field's claim about `rich_filters.filters`' shape turned out to
-be **wrong** — see `docs/decisions/02-rich-filters-wire-format-correction.md`
-for what was actually true and how the `handoff_complete` result corrected
-it in the same audit trail.
+The `notes` field's description of `rich_filters.filters`' shape was
+refined during frontend implementation — see
+`docs/decisions/02-contract-refined-during-handoff.md` for what was
+actually simplest, and how the `handoff_complete` result carried that
+refinement forward in the same audit trail.
