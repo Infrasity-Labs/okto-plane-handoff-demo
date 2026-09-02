@@ -1,0 +1,9 @@
+demo-state/*.log
+*.log
+node_modules/
+.turbo/
+plane/apps/web/test-results/
+plane/apps/web/playwright-report/
+plane/**/.env
+plane/**/dist/
+plane/**/build/

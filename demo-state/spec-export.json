@@ -1,0 +1,1971 @@
+{
+  "outcome": "success",
+  "data": {
+    "id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+    "board_id": "d72390b0-43d9-4448-883b-e5937f8e4454",
+    "title": "CSV export \u2014 backend/frontend integration points",
+    "description": "## Parent Ideation Context\n- Title: CSV export for filtered issue views\n- Version: 17\n\n### Description\nUsers need to export the issues currently visible in an Issues List view \u2014 respecting whatever filters/sort are active \u2014 as a CSV file, for reporting and sharing outside Plane. Real, commonly-requested feature across project-management tools. Backend: new DRF endpoint honoring the same filter/sort params as the existing issue-list endpoint, small result sets return CSV synchronously, large ones queue a Celery job and return a signed download link, respecting project member view permissions. Frontend: an Export action on the Issues List view, filter-aware, with toast/progress state and polling for async exports.\n\n### Problem Statement\nUsers viewing a filtered/sorted Issues List in Plane have no way to get that exact view out of the app as a file. They currently resort to manual copy-paste or third-party scraping to share issue data with stakeholders who don't have Plane access, or to build reports outside the tool. This is a gap versus comparable project-management tools, which almost universally offer list export.\n\nScope is bounded to CSV export of the Issues List view, respecting whatever filter/sort state is currently applied \u2014 not a general data-export/reporting feature, not other entity types (cycles, modules, pages), and not other formats (XLSX, PDF) for v1.\n\n### Proposed Approach\nBackend (apps/api): new `GET /api/v1/workspaces/&lt;slug&gt;/projects/&lt;id&gt;/issues/export/` endpoint reusing the existing issue-list endpoint's filter/sort query-param handling and project-member view permissions (no exporting issues a role can't see).\n\n- Sync/async split at a **500-issue** ceiling (resolved via Q&A: conservative choice, favors sync-path latency safety over minimizing async volume). Below 500 matched issues, the CSV streams back synchronously in the response. At or above 500, the request queues a Celery job (matching Plane's existing async job patterns) and returns a signed download link.\n- CSV columns are a **fixed core set** (resolved via Q&A: ID, title, status, priority, assignee, labels, due date, created/updated) \u2014 not view-configuration-dependent, not a full field superset. Predictable schema for both the serializer and any downstream tooling parsing the file.\n- Signed download links expire after **24 hours** (resolved via Q&A: more forgiving than Plane's existing 1-hour SIGNED_URL_EXPIRATION default for other signed links, since a queued export may sit before the user returns to download it; accepted tradeoff of a longer exposure window for v1).\n\nFrontend (apps/web): filter-aware \"Export\" action on the Issues List view \u2014 exports exactly what's currently on screen. Sync path triggers an immediate file download; async path shows toast + progress state and polls for the signed link, then prompts download.\n\nTest/Validator card: backend pytest coverage across filter combinations and permission boundaries; frontend Playwright test for the export flow (both sync and async paths); validator confirms both against the spec's acceptance criteria before the card is marked done.\n\n### Scope Assessment\n- Domains: 2/5\n- Ambiguity: 2/5\n- Dependencies: 1/5\n- Complexity: medium",
+    "context": "## Refinement Description\n## Parent Ideation Context\n- Title: CSV export for filtered issue views\n- Version: 17\n\n### Description\nUsers need to export the issues currently visible in an Issues List view \u2014 respecting whatever filters/sort are active \u2014 as a CSV file, for reporting and sharing outside Plane. Real, commonly-requested feature across project-management tools. Backend: new DRF endpoint honoring the same filter/sort params as the existing issue-list endpoint, small result sets return CSV synchronously, large ones queue a Celery job and return a signed download link, respecting project member view permissions. Frontend: an Export action on the Issues List view, filter-aware, with toast/progress state and polling for async exports.\n\n### Problem Statement\nUsers viewing a filtered/sorted Issues List in Plane have no way to get that exact view out of the app as a file. They currently resort to manual copy-paste or third-party scraping to share issue data with stakeholders who don't have Plane access, or to build reports outside the tool. This is a gap versus comparable project-management tools, which almost universally offer list export.\n\nScope is bounded to CSV export of the Issues List view, respecting whatever filter/sort state is currently applied \u2014 not a general data-export/reporting feature, not other entity types (cycles, modules, pages), and not other formats (XLSX, PDF) for v1.\n\n### Proposed Approach\nBackend (apps/api): new `GET /api/v1/workspaces/&lt;slug&gt;/projects/&lt;id&gt;/issues/export/` endpoint reusing the existing issue-list endpoint's filter/sort query-param handling and project-member view permissions (no exporting issues a role can't see).\n\n- Sync/async split at a **500-issue** ceiling (resolved via Q&A: conservative choice, favors sync-path latency safety over minimizing async volume). Below 500 matched issues, the CSV streams back synchronously in the response. At or above 500, the request queues a Celery job (matching Plane's existing async job patterns) and returns a signed download link.\n- CSV columns are a **fixed core set** (resolved via Q&A: ID, title, status, priority, assignee, labels, due date, created/updated) \u2014 not view-configuration-dependent, not a full field superset. Predictable schema for both the serializer and any downstream tooling parsing the file.\n- Signed download links expire after **24 hours** (resolved via Q&A: more forgiving than Plane's existing 1-hour SIGNED_URL_EXPIRATION default for other signed links, since a queued export may sit before the user returns to download it; accepted tradeoff of a longer exposure window for v1).\n\nFrontend (apps/web): filter-aware \"Export\" action on the Issues List view \u2014 exports exactly what's currently on screen. Sync path triggers an immediate file download; async path shows toast + progress state and polls for the signed link, then prompts download.\n\nTest/Validator card: backend pytest coverage across filter combinations and permission boundaries; frontend Playwright test for the export flow (both sync and async paths); validator confirms both against the spec's acceptance criteria before the card is marked done.\n\n### Scope Assessment\n- Domains: 2/5\n- Ambiguity: 2/5\n- Dependencies: 1/5\n- Complexity: medium\n\n## In Scope\n- Extend ExportIssuesEndpoint / issue_export_task to accept and apply the Issues List view's active filter/sort state via the existing (currently unused) ExporterHistory.rich_filters field\n- Export action on the IssuesHeader toolbar (apps/web/core/components/issues/header.tsx, Header.RightItem), filter-aware, reusing the existing ExportForm/PrevExports toast+polling UX pattern\n- Reuse existing IssueExportSerializer column set as-is (no new serializer)\n- Reuse existing always-async ExportIssuesEndpoint/Celery/7-day-signed-URL pattern as-is (no new sync path, no new expiry policy)\n- Permission scoping consistent with the existing exporter's WORKSPACE-level role check\n\n## Out of Scope\n- A new/separate export endpoint independent of the existing ExportIssuesEndpoint\n- A new CSV column set or new serializer\n- A new synchronous (non-Celery) export path\n- A new signed-URL expiry policy\n- Other entity types (cycles, modules, pages)\n- Other export formats beyond what the existing exporter already supports (it already supports XLSX/JSON alongside CSV \u2014 no new format work needed)\n- Configurable CSV column selection\n\n## Analysis\nInvestigated the actual `okto-plane-handoff-demo/plane` fork (branch `feature/issue-csv-export`, forked from `makeplane/plane`) before assuming any new endpoint was needed. Key finding: **Plane already ships a complete CSV/XLSX/JSON export system** \u2014 this is not a greenfield addition, it is an extension of existing, working infrastructure.\n\n**Existing async export pipeline (evidence:plane-repo, brownfield delivered behavior):**\n- `ExportIssuesEndpoint` (`apps/api/plane/app/views/exporter/base.py:18-79`) \u2014 `POST /workspaces/<slug>/export-issues/`, `@allow_permission([ROLE.ADMIN, ROLE.MEMBER], level=\"WORKSPACE\")`. Creates an `ExporterHistory` row (`status=\"queued\"`), calls `issue_export_task.delay(...)`, returns immediately. `GET` on the same endpoint lists `ExporterHistory` for polling.\n- `issue_export_task` (`apps/api/plane/bgtasks/export_task.py:127-226`, `@shared_task`) \u2014 builds the `Issue` queryset with the same membership/role scoping as the list endpoints, serializes via `DataExporter(IssueExportSerializer, format_type=provider)`, zips, uploads, sets `status=\"completed\"`/`\"failed\"`.\n- `upload_to_s3` (`export_task.py:42-124`) \u2014 generates the presigned download URL via boto3 `generate_presigned_url`, `ExpiresIn = 7 * 24 * 60 * 60` (**7 days** \u2014 an established, already-used convention, not the 24h this refinement's parent ideation assumed before this investigation).\n- `ExporterHistory` model (`apps/api/plane/db/models/exporter.py:24-63`) already has a `status` state machine (`queued|processing|completed|failed`), `provider`, `url`, `key`, and \u2014 notably \u2014 a `filters`/`rich_filters` JSONField that is **present on the model but unused**: `ExportForm` (`apps/web/core/components/exporter/export-form.tsx:216-248`) has a `WorkspaceLevelWorkItemFiltersHOC` block stubbed out/commented, meaning Plane's own developers scaffolded filter-aware export but never wired it up.\n- `IssueExportSerializer` (`apps/api/plane/utils/porters/serializers/issue.py:12-63+`) is already a rich, human-readable export shape: `identifier`, `project_name`, `project_identifier`, `state_name`, `priority`, `assignees` (names), `labels` (names), dates, `estimate`, `cycles`, `modules`, `sub_issues_count` \u2014 richer than any new fixed column set would be, and already CSV-wired via `DataExporter`.\n- Frontend UX pattern already exists end-to-end: `ExportForm` (`export-form.tsx:100-138`) fires the job and shows a toast (\"Once the export is ready you will be able to download it\") via `@plane/propel/toast`; `PrevExports` (`apps/web/core/components/exporter/prev-exports.tsx:49-74`) polls the `ExporterHistory` list every 3000ms via `setInterval` while any row is `processing`, with a manual \"Refresh status\" fallback.\n- Confirmed no separate/newer async-job abstraction exists elsewhere in `apps/web` \u2014 the exporter feature is the only polling-based async-job pattern in the codebase (explicit non-finding, not an assumption).\n\n**Toolbar integration point:** `IssuesHeader` (`apps/web/core/components/issues/header.tsx:35-131`), specifically `Header.RightItem` (lines 107-127) where `HeaderFilters` and the \"Add work item\" button already live \u2014 this is shared across all Issues List layouts (list/spreadsheet/kanban), so a new Export action placed there appears regardless of active layout.\n\n**Decision reconciliation (see `decisions` \u2014 this refinement corrects three assumptions frozen in the parent ideation's `done` snapshot, per user confirmation):** the ideation's sync/async 500-issue threshold, 24h signed-URL expiry, and fixed-core-column-set decisions were made without knowledge of the existing exporter; on discovering the contradiction, the choice was surfaced to the user rather than silently overridden, and the user chose to adopt Plane's existing conventions in all three cases. This ideation is superseded by, not contradicted by, this refinement \u2014 the underlying goal (filter-aware CSV export from the Issues List view) is unchanged; only the implementation strategy shifted from \"build new\" to \"extend existing.\"\n\n## Decisions\n- SUPERSEDES ideation decision (sync/async 500-issue threshold): adopt Plane's existing always-async ExportIssuesEndpoint/issue_export_task pattern instead of building a new synchronous fast path. Alternatives considered: keep the new sync path as originally decided (rejected \u2014 would duplicate/diverge from an established, working async convention for no clear user benefit; a small export still completes in seconds via the existing 3s-interval poll). Source: apps/api/plane/app/views/exporter/base.py:18-79, apps/api/plane/bgtasks/export_task.py:127-226. User confirmed via Q&A.\n- SUPERSEDES ideation decision (24h signed-URL expiry): adopt the existing 7-day presigned-URL expiry (upload_to_s3, export_task.py:47,75-79,108-112) instead of a new 24h value. Alternatives considered: keep 24h as a tighter security window (rejected \u2014 introduces an inconsistent expiry policy across the app's export surfaces for a link that already reuses the same S3/MinIO bucket and permission model). User confirmed via Q&A.\n- SUPERSEDES ideation decision (fixed core CSV column set): reuse the existing IssueExportSerializer (apps/api/plane/utils/porters/serializers/issue.py:12-63+) instead of authoring a new narrower serializer. Alternatives considered: the ideation's fixed core set of 8 fields (rejected \u2014 the existing serializer already ships a richer, human-readable shape wired to CSV; building a narrower one would be duplicate serialization code for less information). User confirmed via Q&A.\n- NEW decision: the feature's real scope is wiring the existing ExportIssuesEndpoint/issue_export_task to accept and apply the Issues List view's active filter/sort state via the already-present-but-unused ExporterHistory.rich_filters field, plus adding an Export action to IssuesHeader's Header.RightItem (apps/web/core/components/issues/header.tsx:107-127) that calls it, rather than building an independent new endpoint. Alternatives considered: a wholly separate view-scoped endpoint (rejected \u2014 apps/web/core/components/exporter/export-form.tsx already stubs a WorkspaceLevelWorkItemFiltersHOC block for exactly this integration, indicating Plane's own team intended this exact extension path). User confirmed via Q&A.",
+    "status": "in_progress",
+    "cancellation_reason": null,
+    "cancelled_by": null,
+    "cancelled_at": null,
+    "edition": 3,
+    "version": 37,
+    "assignee_id": null,
+    "created_by": "07ebd8e9-8874-4bd4-b014-bd4daedfb886",
+    "created_at": "2026-09-02T10:39:42",
+    "updated_at": "2026-09-02T11:10:43",
+    "labels": [
+      "feature",
+      "csv-export",
+      "issues"
+    ],
+    "skip_overrides": [],
+    "ideation_id": "25a1a9d2-600e-4511-95fb-3326e1298b1f",
+    "refinement_id": "1c15a9e3-7c48-473d-abfc-4fefbdd3986b",
+    "functional_requirements": [
+      {
+        "id": "fr_ba187119",
+        "text": "The workspace export endpoint (POST /api/workspaces/<slug>/export-issues/, ExportIssuesEndpoint) accepts an optional `rich_filters` object in the request body mirroring the Issues List view's active filter/sort state (project_id, IssueFilterSet-compatible filter fields, order_by); when present, issue_export_task applies these filters to the Issue queryset before serialization, in addition to the existing membership/role scoping.",
+        "status": "active",
+        "linked_task_ids": [
+          "20960449-5812-4e63-a3c6-f31b76996396"
+        ]
+      },
+      {
+        "id": "fr_9ea7271b",
+        "text": "When `rich_filters` is omitted from the request, the endpoint behaves exactly as it does today (full workspace export) \u2014 fully backward compatible with existing callers of ExportIssuesEndpoint.",
+        "status": "active",
+        "linked_task_ids": [
+          "20960449-5812-4e63-a3c6-f31b76996396"
+        ]
+      },
+      {
+        "id": "fr_48065e35",
+        "text": "The ExporterHistory row persists the submitted `rich_filters` verbatim in its existing `rich_filters` JSONField for audit/replay, using the field that already exists on the model but is currently never populated.",
+        "status": "active",
+        "linked_task_ids": [
+          "20960449-5812-4e63-a3c6-f31b76996396"
+        ]
+      },
+      {
+        "id": "fr_f07ba72e",
+        "text": "The Issues List toolbar (IssuesHeader component, Header.RightItem section) renders an 'Export CSV' action, visible only to a user whose role satisfies the existing exporter's WORKSPACE-level role check (ROLE.ADMIN or ROLE.MEMBER).",
+        "status": "active",
+        "linked_task_ids": [
+          "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+        ]
+      },
+      {
+        "id": "fr_4228ce70",
+        "text": "Clicking the Export CSV action submits a POST to /api/workspaces/<slug>/export-issues/ with provider='csv' and a `rich_filters` payload built from the current Issues List view's active project, filter, and sort state.",
+        "status": "active",
+        "linked_task_ids": [
+          "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+        ]
+      },
+      {
+        "id": "fr_b1254d2e",
+        "text": "On submission, the frontend shows a toast confirming the export was queued, reusing the existing ExportForm success-toast pattern (@plane/propel/toast).",
+        "status": "active",
+        "linked_task_ids": [
+          "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+        ]
+      },
+      {
+        "id": "fr_9faf52a6",
+        "text": "The frontend polls the ExporterHistory list via the existing PrevExports interval mechanism and surfaces a download action once the matching entry's status becomes 'completed'.",
+        "status": "active",
+        "linked_task_ids": [
+          "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+        ]
+      },
+      {
+        "id": "fr_1345c140",
+        "text": "If the matching export job's status becomes 'failed', the frontend surfaces the failure via a distinct error/toast state rather than continuing to poll indefinitely.",
+        "status": "active",
+        "linked_task_ids": [
+          "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+        ]
+      }
+    ],
+    "technical_requirements": [
+      {
+        "id": "tr_edae7ce9",
+        "text": "`rich_filters` MUST be validated server-side against the same filter vocabulary as `IssueFilterSet` (apps/api/plane/utils/filters/filterset.py) \u2014 an unrecognized filter key is rejected with HTTP 400, never silently ignored, to prevent a silently-wrong export.",
+        "linked_task_ids": [
+          "20960449-5812-4e63-a3c6-f31b76996396"
+        ],
+        "status": "active"
+      },
+      {
+        "id": "tr_d628f46e",
+        "text": "`issue_export_task` MUST apply `rich_filters` via the same ComplexFilterBackend/`IssueFilterSet`-compatible queryset construction already used by `IssueListEndpoint` (apps/api/plane/app/views/issue/base.py:80-205) \u2014 not a parallel/duplicate filter implementation \u2014 so filter semantics never drift between the live Issues List view and its export.",
+        "linked_task_ids": [
+          "20960449-5812-4e63-a3c6-f31b76996396"
+        ],
+        "status": "active"
+      },
+      {
+        "id": "tr_ee735327",
+        "text": "The existing membership/role scoping already present in `issue_export_task` (project__project_projectmember__member=..., is_active=True) remains the outer bound on every export: `rich_filters` may narrow the exported set but must never be capable of expanding it beyond what the requesting user's role can already view.",
+        "linked_task_ids": [
+          "20960449-5812-4e63-a3c6-f31b76996396"
+        ],
+        "status": "active"
+      },
+      {
+        "id": "tr_34824994",
+        "text": "No change to `upload_to_s3`'s presigned-URL expiry (7 days, export_task.py:47,75-79,108-112) or to `IssueExportSerializer`'s field set (apps/api/plane/utils/porters/serializers/issue.py:12-63+) \u2014 per the refinement's superseding decision, this feature only adds filter application to the existing pipeline, not new serialization or storage code.",
+        "linked_task_ids": [
+          "20960449-5812-4e63-a3c6-f31b76996396"
+        ],
+        "status": "active"
+      },
+      {
+        "id": "tr_37591f99",
+        "text": "The Export button's visible/disabled state on the frontend MUST be derived from the same role/permission data the Issues List toolbar already uses for the adjacent 'Add work item' button (apps/web/core/components/issues/header.tsx:107-127) \u2014 not a new, separately-maintained permission check.",
+        "linked_task_ids": [
+          "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+        ],
+        "status": "active"
+      }
+    ],
+    "acceptance_criteria": [
+      {
+        "id": "ac_3d3a513d",
+        "text": "Given an Issues List view with an active filter (e.g. status = In Progress) and a chosen sort order, when the user clicks Export CSV, then the downloaded CSV contains only issues matching that filter, in the chosen sort order, and contains zero issues outside the filter.",
+        "status": "active"
+      },
+      {
+        "id": "ac_7cfef5dd",
+        "text": "Given a user whose role has no view access to a project's issues, when that project's Issues List is rendered, then the Export CSV action is not rendered or is disabled for that project.",
+        "status": "active"
+      },
+      {
+        "id": "ac_89a44578",
+        "text": "Given a rich_filters payload containing an unrecognized filter key, when the export request is submitted, then the server responds HTTP 400 with a structured error identifying the invalid key, and no ExporterHistory row transitions past 'queued'.",
+        "status": "active"
+      },
+      {
+        "id": "ac_f33790a9",
+        "text": "Given an export job that reaches status='completed', when the frontend's next poll observes it, then the UI displays a working download action that resolves to the CSV via the existing 7-day presigned URL.",
+        "status": "active"
+      },
+      {
+        "id": "ac_6b1051d8",
+        "text": "Given an export job that reaches status='failed', when the frontend's next poll observes it, then the UI displays a failure indication visibly distinct from the in-progress/polling state.",
+        "status": "active"
+      },
+      {
+        "id": "ac_fca39545",
+        "text": "Given a request to POST /api/workspaces/<slug>/export-issues/ with no rich_filters field (a legacy caller), when processed, then the endpoint's behavior is identical to its pre-feature behavior (full workspace export, no regression).",
+        "status": "active"
+      }
+    ],
+    "test_scenarios": [
+      {
+        "id": "ts_f858606d",
+        "title": "Export respects active filter and sort",
+        "linked_criteria": [
+          "ac_3d3a513d"
+        ],
+        "scenario_type": "integration",
+        "given": "A project with 10 issues, 4 of which have priority=urgent, and an Issues List view with filter priority=urgent and sort=-created_at active",
+        "when": "The user clicks Export CSV",
+        "then": "The completed export's CSV contains exactly the 4 urgent issues, ordered by created_at descending, and zero non-urgent issues",
+        "notes": null,
+        "status": "passed",
+        "linked_task_ids": [
+          "b7bdccfc-7040-4847-a9fc-00dcbd363e24"
+        ],
+        "evidence": {
+          "evidence_class": "automated_test_pointer",
+          "test_file_path": "apps/api/plane/tests/contract/app/test_export_issues_rich_filters_app.py",
+          "test_function": "TestApplyRichFilters::test_narrows_to_matching_priority_only"
+        }
+      },
+      {
+        "id": "ts_b8cd4cfc",
+        "title": "Export action hidden for a role without view access",
+        "linked_criteria": [
+          "ac_7cfef5dd"
+        ],
+        "scenario_type": "negative",
+        "given": "A user whose workspace role does not satisfy ROLE.ADMIN or ROLE.MEMBER for the target project",
+        "when": "That user's Issues List view for the project is rendered",
+        "then": "The Export CSV action is not present in Header.RightItem (or is rendered disabled), matching the visibility of the existing 'Add work item' button",
+        "notes": null,
+        "status": "draft",
+        "linked_task_ids": [
+          "2df57f0c-07e1-4c86-9fd2-52c96f050c27"
+        ]
+      },
+      {
+        "id": "ts_09958d47",
+        "title": "Unrecognized filter key rejects the request",
+        "linked_criteria": [
+          "ac_89a44578"
+        ],
+        "scenario_type": "negative",
+        "given": "A POST to /api/workspaces/&lt;slug&gt;/export-issues/ with rich_filters.filters containing the key \"not_a_real_filter\"",
+        "when": "The request is processed",
+        "then": "The server responds HTTP 400 with error=invalid_filter_key naming \"not_a_real_filter\", and no ExporterHistory row advances past status=queued for this request",
+        "notes": null,
+        "status": "passed",
+        "linked_task_ids": [
+          "b7bdccfc-7040-4847-a9fc-00dcbd363e24"
+        ],
+        "evidence": {
+          "evidence_class": "automated_test_pointer",
+          "test_file_path": "apps/api/plane/tests/contract/app/test_export_issues_rich_filters_app.py",
+          "test_function": "TestExportIssuesRichFiltersEndpoint::test_unrecognized_filter_key_rejects_with_400"
+        }
+      },
+      {
+        "id": "ts_4baa4e47",
+        "title": "Completed export surfaces a working download link",
+        "linked_criteria": [
+          "ac_f33790a9"
+        ],
+        "scenario_type": "integration",
+        "given": "An export job in status=processing that the frontend is polling via the existing PrevExports interval",
+        "when": "The job transitions to status=completed with a presigned url set",
+        "then": "The next poll surfaces a download action in the UI, and following it downloads the CSV via the presigned URL before its 7-day expiry",
+        "notes": null,
+        "status": "draft",
+        "linked_task_ids": [
+          "2df57f0c-07e1-4c86-9fd2-52c96f050c27"
+        ]
+      },
+      {
+        "id": "ts_2f92da90",
+        "title": "Failed export surfaces a distinct error state",
+        "linked_criteria": [
+          "ac_6b1051d8"
+        ],
+        "scenario_type": "negative",
+        "given": "An export job in status=processing that the frontend is polling",
+        "when": "The job transitions to status=failed",
+        "then": "The next poll surfaces a failure indication in the UI that is visually and textually distinct from the processing/spinner state, and polling for that job stops",
+        "notes": null,
+        "status": "draft",
+        "linked_task_ids": [
+          "2df57f0c-07e1-4c86-9fd2-52c96f050c27"
+        ]
+      },
+      {
+        "id": "ts_28b5c180",
+        "title": "Legacy request without rich_filters is unaffected",
+        "linked_criteria": [
+          "ac_fca39545"
+        ],
+        "scenario_type": "integration",
+        "given": "The existing workspace-level ExportForm submits a POST to /api/workspaces/&lt;slug&gt;/export-issues/ with no rich_filters field, exactly as it does today",
+        "when": "The request is processed by the modified endpoint and issue_export_task",
+        "then": "The resulting export contains the full workspace issue set exactly as it would have before this feature shipped \u2014 no regression",
+        "notes": null,
+        "status": "passed",
+        "linked_task_ids": [
+          "b7bdccfc-7040-4847-a9fc-00dcbd363e24"
+        ],
+        "evidence": {
+          "evidence_class": "automated_test_pointer",
+          "test_file_path": "apps/api/plane/tests/contract/app/test_export_issues_rich_filters_app.py",
+          "test_function": "TestExportIssuesRichFiltersEndpoint::test_legacy_request_without_rich_filters_is_unaffected"
+        }
+      }
+    ],
+    "business_rules": [
+      {
+        "id": "br_89f5a0bf",
+        "title": "rich_filters can only narrow the exported set, never widen it",
+        "rule": "The exported issue set after applying rich_filters must always be a subset of the issues the requesting user's role already has view access to, computed by the existing membership/role scoping in issue_export_task",
+        "when": "A request to POST /api/workspaces/&lt;slug&gt;/export-issues/ includes a rich_filters payload",
+        "then": "issue_export_task applies rich_filters as an additional AND-ed constraint on top of the existing role-scoped queryset, never as a replacement for it or an independent filter that could bypass role scoping",
+        "linked_requirements": [
+          "fr_ba187119",
+          "fr_48065e35"
+        ],
+        "notes": "Prevents a maliciously or accidentally crafted rich_filters payload from exporting issues the user cannot otherwise see. Source: apps/api/plane/bgtasks/export_task.py existing role-scoping queryset.",
+        "linked_task_ids": [
+          "20960449-5812-4e63-a3c6-f31b76996396"
+        ]
+      },
+      {
+        "id": "br_ee31200e",
+        "title": "Unknown filter keys reject the request rather than degrading silently",
+        "rule": "The server must not silently drop, ignore, or apply a best-effort interpretation of an unrecognized filter key",
+        "when": "rich_filters contains one or more keys that are not part of the IssueFilterSet-compatible filter vocabulary",
+        "then": "The endpoint responds HTTP 400 with a structured error identifying the invalid key(s), and no ExporterHistory row is created or advances past queued for that request",
+        "linked_requirements": [
+          "fr_ba187119"
+        ],
+        "notes": "A silently-ignored filter key would produce an export that looks correct but is silently wrong (exports more than the user intended) \u2014 fail closed instead.",
+        "linked_task_ids": [
+          "20960449-5812-4e63-a3c6-f31b76996396"
+        ]
+      },
+      {
+        "id": "br_035c1aac",
+        "title": "Omitting rich_filters is fully backward compatible",
+        "rule": "The absence of rich_filters must never be interpreted as an empty/zero-match filter",
+        "when": "A request to POST /api/workspaces/&lt;slug&gt;/export-issues/ has no rich_filters field at all (legacy caller / existing ExportForm workspace-level export)",
+        "then": "The endpoint and issue_export_task behave exactly as they did before this feature \u2014 full workspace export, no behavioral regression for existing callers",
+        "linked_requirements": [
+          "fr_9ea7271b"
+        ],
+        "notes": "Protects the existing ExportForm workspace-level export flow, which will continue calling this endpoint without rich_filters.",
+        "linked_task_ids": [
+          "20960449-5812-4e63-a3c6-f31b76996396"
+        ]
+      },
+      {
+        "id": "br_211ce06d",
+        "title": "Export button visibility mirrors the existing 'Add work item' permission check",
+        "rule": "The Export CSV action must not introduce a second, independently-maintained permission check that could drift from the existing role check",
+        "when": "The Issues List toolbar (Header.RightItem) is rendered for a given user and project",
+        "then": "Export CSV's visible/disabled state is derived from the same role/permission data source already used for the adjacent 'Add work item' button",
+        "linked_requirements": [
+          "fr_f07ba72e"
+        ],
+        "notes": "Prevents permission-check drift between two adjacent toolbar actions over time.",
+        "linked_task_ids": [
+          "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+        ]
+      },
+      {
+        "id": "br_2895f138",
+        "title": "Submitted export request always reflects the current view state",
+        "rule": "The rich_filters payload sent to the server must be built from the view's live filter/project/sort state at the moment of the click, not a stale or default snapshot",
+        "when": "The user clicks Export CSV on the Issues List toolbar",
+        "then": "The request always includes provider='csv' and a rich_filters object matching what is currently rendered on screen, and a queued-confirmation toast is shown immediately after the request is accepted",
+        "linked_requirements": [
+          "fr_4228ce70",
+          "fr_b1254d2e"
+        ],
+        "notes": "Ensures the exported file always matches what the user visually confirmed before clicking Export, per the ideation's core promise ('exports exactly what's on screen').",
+        "linked_task_ids": [
+          "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+        ]
+      },
+      {
+        "id": "br_2c611fa0",
+        "title": "Polling terminates on a terminal job status, never spins forever",
+        "rule": "Polling for a specific job must stop once that job reaches a terminal status (completed or failed) \u2014 it must never continue polling indefinitely past a terminal state",
+        "when": "A submitted export job is being polled via the existing PrevExports interval mechanism",
+        "then": "On status=completed the UI shows a download action; on status=failed the UI shows a distinct failure indication; in both cases polling for that specific job ends",
+        "linked_requirements": [
+          "fr_9faf52a6",
+          "fr_1345c140"
+        ],
+        "notes": "Reuses PrevExports' existing status===processing interval-clearing behavior; extends it to explicitly surface the failed terminal case rather than leaving it indistinguishable from processing.",
+        "linked_task_ids": [
+          "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+        ]
+      }
+    ],
+    "api_contracts": [
+      {
+        "id": "api_26917c39",
+        "method": "POST",
+        "path": "/api/workspaces/{slug}/export-issues/",
+        "description": "Extends the existing ExportIssuesEndpoint with an optional rich_filters payload that scopes the export to the Issues List view's active filter/sort state. All existing behavior (provider, permissions, ExporterHistory lifecycle) is unchanged when rich_filters is omitted.",
+        "request_body": {
+          "provider": "csv",
+          "project": "&lt;project_uuid&gt;",
+          "multiple": false,
+          "slim": false,
+          "rich_filters": {
+            "project_id": "&lt;project_uuid&gt;",
+            "filters": {
+              "state": [
+                "&lt;state_uuid&gt;"
+              ],
+              "priority": [
+                "urgent",
+                "high"
+              ]
+            },
+            "order_by": "-priority"
+          }
+        },
+        "response_success": {
+          "status": 200,
+          "body": {
+            "message": "Once the export is ready you will be able to download it"
+          }
+        },
+        "response_errors": [
+          {
+            "status": 400,
+            "condition": "rich_filters contains an unrecognized filter key",
+            "body": {
+              "error": "invalid_filter_key",
+              "detail": "Unrecognized filter key(s): &lt;keys&gt;"
+            }
+          },
+          {
+            "status": 403,
+            "condition": "requesting user's role fails the existing WORKSPACE-level ROLE.ADMIN/ROLE.MEMBER check",
+            "body": {
+              "error": "permission_denied"
+            }
+          }
+        ],
+        "linked_requirements": [
+          "fr_ba187119",
+          "fr_9ea7271b",
+          "fr_48065e35"
+        ],
+        "linked_rules": null,
+        "linked_task_ids": [
+          "20960449-5812-4e63-a3c6-f31b76996396"
+        ],
+        "notes": "Existing endpoint: apps/api/plane/app/views/exporter/base.py:18-79. Extension point: rich_filters is the existing-but-unused ExporterHistory.rich_filters field, now actually populated and applied.",
+        "contract_type": "http"
+      }
+    ],
+    "decisions": [
+      {
+        "id": "dec_1d277ec6",
+        "title": "Extend the existing ExportIssuesEndpoint via rich_filters rather than build a new endpoint",
+        "rationale": "Wiring the Issues List view's active filter/sort state through the existing rich_filters field (instead of a new independent endpoint) reuses working, tested infrastructure \u2014 permission scoping, Celery job lifecycle, signed-URL generation, and the CSV serializer \u2014 for the cost of one new server-side filter-application/validation path, rather than duplicating the entire export pipeline.",
+        "context": "Refinement investigation of the actual Plane fork found a complete, working CSV/XLSX/JSON export pipeline already exists (ExportIssuesEndpoint, issue_export_task, ExporterHistory, presigned S3/MinIO URLs), including an unused rich_filters JSONField on ExporterHistory and a stubbed-out WorkspaceLevelWorkItemFiltersHOC block in ExportForm \u2014 clear evidence Plane's own team scaffolded this exact extension point but never wired it up.",
+        "alternatives_considered": [
+          "A wholly separate view-scoped endpoint (GET /projects/<id>/issues/export/) independent of ExportIssuesEndpoint \u2014 rejected: duplicates permission scoping, Celery task, and signed-URL logic that already exists and works, for no functional benefit.",
+          "A new synchronous fast-path for small exports \u2014 rejected: diverges from the app's one established async-export convention; a small filtered export still completes within the existing 3-second polling interval."
+        ],
+        "supersedes_decision_id": null,
+        "linked_requirements": [
+          "fr_ba187119",
+          "fr_9ea7271b",
+          "fr_48065e35"
+        ],
+        "linked_task_ids": [
+          "20960449-5812-4e63-a3c6-f31b76996396"
+        ],
+        "status": "active",
+        "notes": "Formalizes the refinement's superseding decisions (see refinement 1c15a9e3, decisions list) as a spec-level Decision entity for the coverage gate."
+      }
+    ],
+    "decisions_stats": {
+      "total": 1,
+      "active": 1,
+      "superseded": 0,
+      "revoked": 0,
+      "other": 0
+    },
+    "evaluations": [
+      {
+        "id": "eval_5c710505",
+        "spec_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+        "evaluator_id": "07ebd8e9-8874-4bd4-b014-bd4daedfb886",
+        "evaluator_name": "Local Agent",
+        "evaluator_type": "agent",
+        "dimensions": {
+          "breakdown_completeness": {
+            "score": 88,
+            "justification": "Every FR, TR, BR, the API contract, and the Decision is linked to at least one of the 4 cards (Backend, Frontend, 2 Test cards) \u2014 verified via the validated spec's linked_task_ids on every structured entity. Backend card owns the server-side FRs/TRs/BRs/contract/decision; Frontend card owns the client-side FRs/TRs/BRs; the two Test cards partition all 6 test scenarios (3 backend-focused, 3 frontend-focused) with no scenario uncovered. No FR, TR, or AC is orphaned from a card."
+          },
+          "granularity": {
+            "score": 83,
+            "justification": "Backend and Frontend cards are each independently executable units of work (one Django/Celery change, one React component change) sized for a single agent session; splitting further (e.g. per-FR cards) would fragment a cohesive endpoint change for no execution benefit. Test cards are split backend/frontend to match the two implementation cards and stay within the board's max_scenarios_per_card=3 limit."
+          },
+          "dependency_coherence": {
+            "score": 85,
+            "justification": "Frontend card depends on Backend card (the frontend calls the contract the backend implements \u2014 real execution-order dependency, now recorded). Backend-test card depends on Backend card; Frontend-test card depends on Frontend card (tests need their implementation to exist first). No circular dependencies; the graph is a straightforward two-level fan-out matching the doc's intended Backend\u2192Frontend(\u2192handoff) sequencing."
+          },
+          "test_coverage_quality": {
+            "score": 85,
+            "justification": "All 6 test scenarios have concrete Given/When/Then with observable outcomes (exact HTTP status codes, exact CSV contents, exact UI state). Coverage includes the happy path (filter respected), two negative/edge paths (permission denial, invalid filter key), both terminal async states (completed, failed), and an explicit backward-compatibility regression scenario \u2014 a materially broader set than happy-path-only coverage."
+          }
+        },
+        "overall_score": 85,
+        "overall_justification": "The spec is ready for execution: every requirement traces to a card, every acceptance criterion traces to a test scenario and a test card, the implementation strategy is grounded in real codebase citations rather than assumption, dependencies are explicit and acyclic, and the one prior ambiguity residue (illustrative vs. exhaustive rich_filters schema) is non-blocking per the validation gate's own finding. No FR/TR/AC is unaddressed by any card.",
+        "recommendation": "approve",
+        "stale": false,
+        "created_at": "2026-09-02T10:54:05.103386+00:00"
+      }
+    ],
+    "skip_test_coverage": false,
+    "skip_rules_coverage": false,
+    "skip_ir_coverage": false,
+    "skip_or_coverage": false,
+    "skip_decisions_coverage": false,
+    "skip_code_evidence_coverage": false,
+    "skip_code_evidence_coverage_global": false,
+    "skip_code_evidence_coverage_effective": false,
+    "skip_qualitative_validation": false,
+    "validation_threshold": null,
+    "cards": [
+      {
+        "id": "20960449-5812-4e63-a3c6-f31b76996396",
+        "title": "Backend: wire rich_filters into ExportIssuesEndpoint / issue_export_task",
+        "status": "done",
+        "priority": "none",
+        "assignee_id": null,
+        "card_type": "normal",
+        "sprint_id": "00539a6f-65a8-463f-ab1c-35b74149a422",
+        "test_scenario_ids": []
+      },
+      {
+        "id": "bb89c680-ce53-4638-8d0c-ee7e3253fa90",
+        "title": "Frontend: Export CSV action on Issues List toolbar",
+        "status": "rejected",
+        "priority": "none",
+        "assignee_id": null,
+        "card_type": "normal",
+        "sprint_id": "00539a6f-65a8-463f-ab1c-35b74149a422",
+        "test_scenario_ids": []
+      },
+      {
+        "id": "b7bdccfc-7040-4847-a9fc-00dcbd363e24",
+        "title": "Test: backend filter/permission/compat coverage",
+        "status": "done",
+        "priority": "none",
+        "assignee_id": null,
+        "card_type": "test",
+        "sprint_id": "00539a6f-65a8-463f-ab1c-35b74149a422",
+        "test_scenario_ids": [
+          "ts_f858606d",
+          "ts_09958d47",
+          "ts_28b5c180"
+        ]
+      },
+      {
+        "id": "2df57f0c-07e1-4c86-9fd2-52c96f050c27",
+        "title": "Test: frontend permission gating + polling UX",
+        "status": "not_started",
+        "priority": "none",
+        "assignee_id": null,
+        "card_type": "test",
+        "sprint_id": "00539a6f-65a8-463f-ab1c-35b74149a422",
+        "test_scenario_ids": [
+          "ts_b8cd4cfc",
+          "ts_4baa4e47",
+          "ts_2f92da90"
+        ]
+      }
+    ],
+    "sprints": [
+      {
+        "id": "00539a6f-65a8-463f-ab1c-35b74149a422",
+        "title": "CSV export \u2014 filter-aware exporter extension",
+        "status": "active",
+        "description": null,
+        "objective": "Wire the existing ExportIssuesEndpoint/issue_export_task to the Issues List view's active filters via rich_filters, and add the Export CSV toolbar action, per the validated spec.",
+        "expected_outcome": "Both implementation cards and both test cards done; validator confirms real evidence (test run output + a real export screenshot) against the spec's acceptance criteria; Nexus handoff artifact (the API contract) matches what the frontend actually implemented against.",
+        "lane_type": "normal",
+        "origin_sprint_id": null,
+        "origin_bug_id": null,
+        "normal_sprint_created": true
+      }
+    ],
+    "integration_requirements": [],
+    "observability_requirements": [],
+    "screen_mockups": [
+      {
+        "id": "sm_4fcfa541",
+        "title": "Issues List \u2014 Export action (sync + async states)",
+        "description": "Export action on the Issues List toolbar. Filter-aware: exports exactly the issues currently matching the active filters/sort. Three states resolved via ideation Q&A: idle (button), sync download (&lt;500 matched issues \u2014 immediate file download, brief spinner), and async queued (&gt;=500 matched issues \u2014 toast + progress state, polling for the signed link, then a download prompt; link valid 24h).",
+        "screen_type": "page",
+        "html_content": "<![CDATA[\n<div style=\"font-family:-apple-system,sans-serif;max-width:640px;padding:24px;border:1px solid #e2e2e2;border-radius:8px;\">\n  <h3 style=\"margin:0 0 16px;font-size:14px;color:#666;\">Issues List \u2014 toolbar (existing filters/sort applied)</h3>\n\n  <div style=\"display:flex;gap:8px;align-items:center;margin-bottom:24px;\">\n    <span style=\"padding:6px 12px;border:1px solid #ccc;border-radius:6px;font-size:13px;\">Filters: Status = In Progress</span>\n    <span style=\"padding:6px 12px;border:1px solid #ccc;border-radius:6px;font-size:13px;\">Sort: Priority \u2193</span>\n    <span style=\"flex:1\"></span>\n    <button style=\"padding:6px 14px;border-radius:6px;background:#3b6;color:#fff;border:none;font-size:13px;\">\u2b07 Export CSV</button>\n  </div>\n\n  <div style=\"display:grid;grid-template-columns:1fr 1fr;gap:16px;\">\n    <div style=\"border:1px dashed #ccc;border-radius:8px;padding:16px;\">\n      <div style=\"font-size:12px;color:#888;margin-bottom:8px;\">State A \u2014 Sync (&lt; 500 matched issues)</div>\n      <div style=\"font-size:13px;\">Click \"Export CSV\" \u2192 brief spinner on the button \u2192 browser download starts immediately (issues_export_2026-09-02.csv).</div>\n    </div>\n    <div style=\"border:1px dashed #ccc;border-radius:8px;padding:16px;\">\n      <div style=\"font-size:12px;color:#888;margin-bottom:8px;\">State B \u2014 Async (&gt;= 500 matched issues)</div>\n      <div style=\"font-size:13px;\">Click \"Export CSV\" \u2192 toast: \"Preparing export of 1,240 issues\u2026\" with a progress indicator \u2192 client polls job status \u2192 toast updates to \"Export ready\" with a Download button (signed link, valid 24h).</div>\n    </div>\n  </div>\n\n  <div style=\"margin-top:16px;font-size:12px;color:#888;\">\n    Export action is hidden/disabled for a user with no view access to the project's issues (permission-gated, matches existing project member view checks).\n  </div>\n</div>\n]]>",
+        "annotations": [],
+        "order": 0,
+        "design_system_ref": null,
+        "design_system_evidence": null,
+        "origin_id": "sm_e58a1e0b",
+        "source_mockup_id": "sm_97fb0485"
+      }
+    ],
+    "architecture_designs": [],
+    "qa_items": [],
+    "knowledge_bases": [],
+    "resolved_references": {
+      "functional_requirements": [
+        {
+          "id": "fr_ba187119",
+          "text": "The workspace export endpoint (POST /api/workspaces/<slug>/export-issues/, ExportIssuesEndpoint) accepts an optional `rich_filters` object in the request body mirroring the Issues List view's active filter/sort state (project_id, IssueFilterSet-compatible filter fields, order_by); when present, issue_export_task applies these filters to the Issue queryset before serialization, in addition to the existing membership/role scoping.",
+          "status": "active",
+          "linked_task_ids": [
+            "20960449-5812-4e63-a3c6-f31b76996396"
+          ],
+          "index": 0,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "fr_9ea7271b",
+          "text": "When `rich_filters` is omitted from the request, the endpoint behaves exactly as it does today (full workspace export) \u2014 fully backward compatible with existing callers of ExportIssuesEndpoint.",
+          "status": "active",
+          "linked_task_ids": [
+            "20960449-5812-4e63-a3c6-f31b76996396"
+          ],
+          "index": 1,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "fr_48065e35",
+          "text": "The ExporterHistory row persists the submitted `rich_filters` verbatim in its existing `rich_filters` JSONField for audit/replay, using the field that already exists on the model but is currently never populated.",
+          "status": "active",
+          "linked_task_ids": [
+            "20960449-5812-4e63-a3c6-f31b76996396"
+          ],
+          "index": 2,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "fr_f07ba72e",
+          "text": "The Issues List toolbar (IssuesHeader component, Header.RightItem section) renders an 'Export CSV' action, visible only to a user whose role satisfies the existing exporter's WORKSPACE-level role check (ROLE.ADMIN or ROLE.MEMBER).",
+          "status": "active",
+          "linked_task_ids": [
+            "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+          ],
+          "index": 3,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "fr_4228ce70",
+          "text": "Clicking the Export CSV action submits a POST to /api/workspaces/<slug>/export-issues/ with provider='csv' and a `rich_filters` payload built from the current Issues List view's active project, filter, and sort state.",
+          "status": "active",
+          "linked_task_ids": [
+            "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+          ],
+          "index": 4,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "fr_b1254d2e",
+          "text": "On submission, the frontend shows a toast confirming the export was queued, reusing the existing ExportForm success-toast pattern (@plane/propel/toast).",
+          "status": "active",
+          "linked_task_ids": [
+            "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+          ],
+          "index": 5,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "fr_9faf52a6",
+          "text": "The frontend polls the ExporterHistory list via the existing PrevExports interval mechanism and surfaces a download action once the matching entry's status becomes 'completed'.",
+          "status": "active",
+          "linked_task_ids": [
+            "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+          ],
+          "index": 6,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "fr_1345c140",
+          "text": "If the matching export job's status becomes 'failed', the frontend surfaces the failure via a distinct error/toast state rather than continuing to poll indefinitely.",
+          "status": "active",
+          "linked_task_ids": [
+            "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+          ],
+          "index": 7,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        }
+      ],
+      "technical_requirements": [
+        {
+          "id": "tr_edae7ce9",
+          "text": "`rich_filters` MUST be validated server-side against the same filter vocabulary as `IssueFilterSet` (apps/api/plane/utils/filters/filterset.py) \u2014 an unrecognized filter key is rejected with HTTP 400, never silently ignored, to prevent a silently-wrong export.",
+          "linked_task_ids": [
+            "20960449-5812-4e63-a3c6-f31b76996396"
+          ],
+          "status": "active",
+          "index": 0,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "tr_d628f46e",
+          "text": "`issue_export_task` MUST apply `rich_filters` via the same ComplexFilterBackend/`IssueFilterSet`-compatible queryset construction already used by `IssueListEndpoint` (apps/api/plane/app/views/issue/base.py:80-205) \u2014 not a parallel/duplicate filter implementation \u2014 so filter semantics never drift between the live Issues List view and its export.",
+          "linked_task_ids": [
+            "20960449-5812-4e63-a3c6-f31b76996396"
+          ],
+          "status": "active",
+          "index": 1,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "tr_ee735327",
+          "text": "The existing membership/role scoping already present in `issue_export_task` (project__project_projectmember__member=..., is_active=True) remains the outer bound on every export: `rich_filters` may narrow the exported set but must never be capable of expanding it beyond what the requesting user's role can already view.",
+          "linked_task_ids": [
+            "20960449-5812-4e63-a3c6-f31b76996396"
+          ],
+          "status": "active",
+          "index": 2,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "tr_34824994",
+          "text": "No change to `upload_to_s3`'s presigned-URL expiry (7 days, export_task.py:47,75-79,108-112) or to `IssueExportSerializer`'s field set (apps/api/plane/utils/porters/serializers/issue.py:12-63+) \u2014 per the refinement's superseding decision, this feature only adds filter application to the existing pipeline, not new serialization or storage code.",
+          "linked_task_ids": [
+            "20960449-5812-4e63-a3c6-f31b76996396"
+          ],
+          "status": "active",
+          "index": 3,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "tr_37591f99",
+          "text": "The Export button's visible/disabled state on the frontend MUST be derived from the same role/permission data the Issues List toolbar already uses for the adjacent 'Add work item' button (apps/web/core/components/issues/header.tsx:107-127) \u2014 not a new, separately-maintained permission check.",
+          "linked_task_ids": [
+            "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+          ],
+          "status": "active",
+          "index": 4,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        }
+      ],
+      "acceptance_criteria": [
+        {
+          "id": "ac_3d3a513d",
+          "text": "Given an Issues List view with an active filter (e.g. status = In Progress) and a chosen sort order, when the user clicks Export CSV, then the downloaded CSV contains only issues matching that filter, in the chosen sort order, and contains zero issues outside the filter.",
+          "status": "active",
+          "index": 0,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "ac_7cfef5dd",
+          "text": "Given a user whose role has no view access to a project's issues, when that project's Issues List is rendered, then the Export CSV action is not rendered or is disabled for that project.",
+          "status": "active",
+          "index": 1,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "ac_89a44578",
+          "text": "Given a rich_filters payload containing an unrecognized filter key, when the export request is submitted, then the server responds HTTP 400 with a structured error identifying the invalid key, and no ExporterHistory row transitions past 'queued'.",
+          "status": "active",
+          "index": 2,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "ac_f33790a9",
+          "text": "Given an export job that reaches status='completed', when the frontend's next poll observes it, then the UI displays a working download action that resolves to the CSV via the existing 7-day presigned URL.",
+          "status": "active",
+          "index": 3,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "ac_6b1051d8",
+          "text": "Given an export job that reaches status='failed', when the frontend's next poll observes it, then the UI displays a failure indication visibly distinct from the in-progress/polling state.",
+          "status": "active",
+          "index": 4,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "ac_fca39545",
+          "text": "Given a request to POST /api/workspaces/<slug>/export-issues/ with no rich_filters field (a legacy caller), when processed, then the endpoint's behavior is identical to its pre-feature behavior (full workspace export, no regression).",
+          "status": "active",
+          "index": 5,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        }
+      ],
+      "test_scenarios": [
+        {
+          "id": "ts_f858606d",
+          "title": "Export respects active filter and sort",
+          "linked_criteria": [
+            "ac_3d3a513d"
+          ],
+          "scenario_type": "integration",
+          "given": "A project with 10 issues, 4 of which have priority=urgent, and an Issues List view with filter priority=urgent and sort=-created_at active",
+          "when": "The user clicks Export CSV",
+          "then": "The completed export's CSV contains exactly the 4 urgent issues, ordered by created_at descending, and zero non-urgent issues",
+          "notes": null,
+          "status": "passed",
+          "linked_task_ids": [
+            "b7bdccfc-7040-4847-a9fc-00dcbd363e24"
+          ],
+          "evidence": {
+            "evidence_class": "automated_test_pointer",
+            "test_file_path": "apps/api/plane/tests/contract/app/test_export_issues_rich_filters_app.py",
+            "test_function": "TestApplyRichFilters::test_narrows_to_matching_priority_only"
+          },
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "ts_b8cd4cfc",
+          "title": "Export action hidden for a role without view access",
+          "linked_criteria": [
+            "ac_7cfef5dd"
+          ],
+          "scenario_type": "negative",
+          "given": "A user whose workspace role does not satisfy ROLE.ADMIN or ROLE.MEMBER for the target project",
+          "when": "That user's Issues List view for the project is rendered",
+          "then": "The Export CSV action is not present in Header.RightItem (or is rendered disabled), matching the visibility of the existing 'Add work item' button",
+          "notes": null,
+          "status": "draft",
+          "linked_task_ids": [
+            "2df57f0c-07e1-4c86-9fd2-52c96f050c27"
+          ],
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "ts_09958d47",
+          "title": "Unrecognized filter key rejects the request",
+          "linked_criteria": [
+            "ac_89a44578"
+          ],
+          "scenario_type": "negative",
+          "given": "A POST to /api/workspaces/&lt;slug&gt;/export-issues/ with rich_filters.filters containing the key \"not_a_real_filter\"",
+          "when": "The request is processed",
+          "then": "The server responds HTTP 400 with error=invalid_filter_key naming \"not_a_real_filter\", and no ExporterHistory row advances past status=queued for this request",
+          "notes": null,
+          "status": "passed",
+          "linked_task_ids": [
+            "b7bdccfc-7040-4847-a9fc-00dcbd363e24"
+          ],
+          "evidence": {
+            "evidence_class": "automated_test_pointer",
+            "test_file_path": "apps/api/plane/tests/contract/app/test_export_issues_rich_filters_app.py",
+            "test_function": "TestExportIssuesRichFiltersEndpoint::test_unrecognized_filter_key_rejects_with_400"
+          },
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "ts_4baa4e47",
+          "title": "Completed export surfaces a working download link",
+          "linked_criteria": [
+            "ac_f33790a9"
+          ],
+          "scenario_type": "integration",
+          "given": "An export job in status=processing that the frontend is polling via the existing PrevExports interval",
+          "when": "The job transitions to status=completed with a presigned url set",
+          "then": "The next poll surfaces a download action in the UI, and following it downloads the CSV via the presigned URL before its 7-day expiry",
+          "notes": null,
+          "status": "draft",
+          "linked_task_ids": [
+            "2df57f0c-07e1-4c86-9fd2-52c96f050c27"
+          ],
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "ts_2f92da90",
+          "title": "Failed export surfaces a distinct error state",
+          "linked_criteria": [
+            "ac_6b1051d8"
+          ],
+          "scenario_type": "negative",
+          "given": "An export job in status=processing that the frontend is polling",
+          "when": "The job transitions to status=failed",
+          "then": "The next poll surfaces a failure indication in the UI that is visually and textually distinct from the processing/spinner state, and polling for that job stops",
+          "notes": null,
+          "status": "draft",
+          "linked_task_ids": [
+            "2df57f0c-07e1-4c86-9fd2-52c96f050c27"
+          ],
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "ts_28b5c180",
+          "title": "Legacy request without rich_filters is unaffected",
+          "linked_criteria": [
+            "ac_fca39545"
+          ],
+          "scenario_type": "integration",
+          "given": "The existing workspace-level ExportForm submits a POST to /api/workspaces/&lt;slug&gt;/export-issues/ with no rich_filters field, exactly as it does today",
+          "when": "The request is processed by the modified endpoint and issue_export_task",
+          "then": "The resulting export contains the full workspace issue set exactly as it would have before this feature shipped \u2014 no regression",
+          "notes": null,
+          "status": "passed",
+          "linked_task_ids": [
+            "b7bdccfc-7040-4847-a9fc-00dcbd363e24"
+          ],
+          "evidence": {
+            "evidence_class": "automated_test_pointer",
+            "test_file_path": "apps/api/plane/tests/contract/app/test_export_issues_rich_filters_app.py",
+            "test_function": "TestExportIssuesRichFiltersEndpoint::test_legacy_request_without_rich_filters_is_unaffected"
+          },
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        }
+      ],
+      "business_rules": [
+        {
+          "id": "br_89f5a0bf",
+          "title": "rich_filters can only narrow the exported set, never widen it",
+          "rule": "The exported issue set after applying rich_filters must always be a subset of the issues the requesting user's role already has view access to, computed by the existing membership/role scoping in issue_export_task",
+          "when": "A request to POST /api/workspaces/&lt;slug&gt;/export-issues/ includes a rich_filters payload",
+          "then": "issue_export_task applies rich_filters as an additional AND-ed constraint on top of the existing role-scoped queryset, never as a replacement for it or an independent filter that could bypass role scoping",
+          "linked_requirements": [
+            "fr_ba187119",
+            "fr_48065e35"
+          ],
+          "notes": "Prevents a maliciously or accidentally crafted rich_filters payload from exporting issues the user cannot otherwise see. Source: apps/api/plane/bgtasks/export_task.py existing role-scoping queryset.",
+          "linked_task_ids": [
+            "20960449-5812-4e63-a3c6-f31b76996396"
+          ],
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "br_ee31200e",
+          "title": "Unknown filter keys reject the request rather than degrading silently",
+          "rule": "The server must not silently drop, ignore, or apply a best-effort interpretation of an unrecognized filter key",
+          "when": "rich_filters contains one or more keys that are not part of the IssueFilterSet-compatible filter vocabulary",
+          "then": "The endpoint responds HTTP 400 with a structured error identifying the invalid key(s), and no ExporterHistory row is created or advances past queued for that request",
+          "linked_requirements": [
+            "fr_ba187119"
+          ],
+          "notes": "A silently-ignored filter key would produce an export that looks correct but is silently wrong (exports more than the user intended) \u2014 fail closed instead.",
+          "linked_task_ids": [
+            "20960449-5812-4e63-a3c6-f31b76996396"
+          ],
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "br_035c1aac",
+          "title": "Omitting rich_filters is fully backward compatible",
+          "rule": "The absence of rich_filters must never be interpreted as an empty/zero-match filter",
+          "when": "A request to POST /api/workspaces/&lt;slug&gt;/export-issues/ has no rich_filters field at all (legacy caller / existing ExportForm workspace-level export)",
+          "then": "The endpoint and issue_export_task behave exactly as they did before this feature \u2014 full workspace export, no behavioral regression for existing callers",
+          "linked_requirements": [
+            "fr_9ea7271b"
+          ],
+          "notes": "Protects the existing ExportForm workspace-level export flow, which will continue calling this endpoint without rich_filters.",
+          "linked_task_ids": [
+            "20960449-5812-4e63-a3c6-f31b76996396"
+          ],
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "br_211ce06d",
+          "title": "Export button visibility mirrors the existing 'Add work item' permission check",
+          "rule": "The Export CSV action must not introduce a second, independently-maintained permission check that could drift from the existing role check",
+          "when": "The Issues List toolbar (Header.RightItem) is rendered for a given user and project",
+          "then": "Export CSV's visible/disabled state is derived from the same role/permission data source already used for the adjacent 'Add work item' button",
+          "linked_requirements": [
+            "fr_f07ba72e"
+          ],
+          "notes": "Prevents permission-check drift between two adjacent toolbar actions over time.",
+          "linked_task_ids": [
+            "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+          ],
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "br_2895f138",
+          "title": "Submitted export request always reflects the current view state",
+          "rule": "The rich_filters payload sent to the server must be built from the view's live filter/project/sort state at the moment of the click, not a stale or default snapshot",
+          "when": "The user clicks Export CSV on the Issues List toolbar",
+          "then": "The request always includes provider='csv' and a rich_filters object matching what is currently rendered on screen, and a queued-confirmation toast is shown immediately after the request is accepted",
+          "linked_requirements": [
+            "fr_4228ce70",
+            "fr_b1254d2e"
+          ],
+          "notes": "Ensures the exported file always matches what the user visually confirmed before clicking Export, per the ideation's core promise ('exports exactly what's on screen').",
+          "linked_task_ids": [
+            "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+          ],
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        },
+        {
+          "id": "br_2c611fa0",
+          "title": "Polling terminates on a terminal job status, never spins forever",
+          "rule": "Polling for a specific job must stop once that job reaches a terminal status (completed or failed) \u2014 it must never continue polling indefinitely past a terminal state",
+          "when": "A submitted export job is being polled via the existing PrevExports interval mechanism",
+          "then": "On status=completed the UI shows a download action; on status=failed the UI shows a distinct failure indication; in both cases polling for that specific job ends",
+          "linked_requirements": [
+            "fr_9faf52a6",
+            "fr_1345c140"
+          ],
+          "notes": "Reuses PrevExports' existing status===processing interval-clearing behavior; extends it to explicitly surface the failed terminal case rather than leaving it indistinguishable from processing.",
+          "linked_task_ids": [
+            "bb89c680-ce53-4638-8d0c-ee7e3253fa90"
+          ],
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        }
+      ],
+      "api_contracts": [
+        {
+          "id": "api_26917c39",
+          "method": "POST",
+          "path": "/api/workspaces/{slug}/export-issues/",
+          "description": "Extends the existing ExportIssuesEndpoint with an optional rich_filters payload that scopes the export to the Issues List view's active filter/sort state. All existing behavior (provider, permissions, ExporterHistory lifecycle) is unchanged when rich_filters is omitted.",
+          "request_body": {
+            "provider": "csv",
+            "project": "&lt;project_uuid&gt;",
+            "multiple": false,
+            "slim": false,
+            "rich_filters": {
+              "project_id": "&lt;project_uuid&gt;",
+              "filters": {
+                "state": [
+                  "&lt;state_uuid&gt;"
+                ],
+                "priority": [
+                  "urgent",
+                  "high"
+                ]
+              },
+              "order_by": "-priority"
+            }
+          },
+          "response_success": {
+            "status": 200,
+            "body": {
+              "message": "Once the export is ready you will be able to download it"
+            }
+          },
+          "response_errors": [
+            {
+              "status": 400,
+              "condition": "rich_filters contains an unrecognized filter key",
+              "body": {
+                "error": "invalid_filter_key",
+                "detail": "Unrecognized filter key(s): &lt;keys&gt;"
+              }
+            },
+            {
+              "status": 403,
+              "condition": "requesting user's role fails the existing WORKSPACE-level ROLE.ADMIN/ROLE.MEMBER check",
+              "body": {
+                "error": "permission_denied"
+              }
+            }
+          ],
+          "linked_requirements": [
+            "fr_ba187119",
+            "fr_9ea7271b",
+            "fr_48065e35"
+          ],
+          "linked_rules": null,
+          "linked_task_ids": [
+            "20960449-5812-4e63-a3c6-f31b76996396"
+          ],
+          "notes": "Existing endpoint: apps/api/plane/app/views/exporter/base.py:18-79. Extension point: rich_filters is the existing-but-unused ExporterHistory.rich_filters field, now actually populated and applied.",
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        }
+      ],
+      "integration_requirements": [],
+      "observability_requirements": [],
+      "decisions": [
+        {
+          "id": "dec_1d277ec6",
+          "title": "Extend the existing ExportIssuesEndpoint via rich_filters rather than build a new endpoint",
+          "rationale": "Wiring the Issues List view's active filter/sort state through the existing rich_filters field (instead of a new independent endpoint) reuses working, tested infrastructure \u2014 permission scoping, Celery job lifecycle, signed-URL generation, and the CSV serializer \u2014 for the cost of one new server-side filter-application/validation path, rather than duplicating the entire export pipeline.",
+          "context": "Refinement investigation of the actual Plane fork found a complete, working CSV/XLSX/JSON export pipeline already exists (ExportIssuesEndpoint, issue_export_task, ExporterHistory, presigned S3/MinIO URLs), including an unused rich_filters JSONField on ExporterHistory and a stubbed-out WorkspaceLevelWorkItemFiltersHOC block in ExportForm \u2014 clear evidence Plane's own team scaffolded this exact extension point but never wired it up.",
+          "alternatives_considered": [
+            "A wholly separate view-scoped endpoint (GET /projects/<id>/issues/export/) independent of ExportIssuesEndpoint \u2014 rejected: duplicates permission scoping, Celery task, and signed-URL logic that already exists and works, for no functional benefit.",
+            "A new synchronous fast-path for small exports \u2014 rejected: diverges from the app's one established async-export convention; a small filtered export still completes within the existing 3-second polling interval."
+          ],
+          "supersedes_decision_id": null,
+          "linked_requirements": [
+            "fr_ba187119",
+            "fr_9ea7271b",
+            "fr_48065e35"
+          ],
+          "linked_task_ids": [
+            "20960449-5812-4e63-a3c6-f31b76996396"
+          ],
+          "status": "active",
+          "notes": "Formalizes the refinement's superseding decisions (see refinement 1c15a9e3, decisions list) as a spec-level Decision entity for the coverage gate.",
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct",
+          "referenced_by_task": false
+        }
+      ],
+      "knowledge_bases": [],
+      "screen_mockups": [
+        {
+          "id": "sm_4fcfa541",
+          "title": "Issues List \u2014 Export action (sync + async states)",
+          "description": "Export action on the Issues List toolbar. Filter-aware: exports exactly the issues currently matching the active filters/sort. Three states resolved via ideation Q&A: idle (button), sync download (&lt;500 matched issues \u2014 immediate file download, brief spinner), and async queued (&gt;=500 matched issues \u2014 toast + progress state, polling for the signed link, then a download prompt; link valid 24h).",
+          "screen_type": "page",
+          "origin_id": "sm_e58a1e0b",
+          "html_content": "<![CDATA[\n<div style=\"font-family:-apple-system,sans-serif;max-width:640px;padding:24px;border:1px solid #e2e2e2;border-radius:8px;\">\n  <h3 style=\"margin:0 0 16px;font-size:14px;color:#666;\">Issues List \u2014 toolbar (existing filters/sort applied)</h3>\n\n  <div style=\"display:flex;gap:8px;align-items:center;margin-bottom:24px;\">\n    <span style=\"padding:6px 12px;border:1px solid #ccc;border-radius:6px;font-size:13px;\">Filters: Status = In Progress</span>\n    <span style=\"padding:6px 12px;border:1px solid #ccc;border-radius:6px;font-size:13px;\">Sort: Priority \u2193</span>\n    <span style=\"flex:1\"></span>\n    <button style=\"padding:6px 14px;border-radius:6px;background:#3b6;color:#fff;border:none;font-size:13px;\">\u2b07 Export CSV</button>\n  </div>\n\n  <div style=\"display:grid;grid-template-columns:1fr 1fr;gap:16px;\">\n    <div style=\"border:1px dashed #ccc;border-radius:8px;padding:16px;\">\n      <div style=\"font-size:12px;color:#888;margin-bottom:8px;\">State A \u2014 Sync (&lt; 500 matched issues)</div>\n      <div style=\"font-size:13px;\">Click \"Export CSV\" \u2192 brief spinner on the button \u2192 browser download starts immediately (issues_export_2026-09-02.csv).</div>\n    </div>\n    <div style=\"border:1px dashed #ccc;border-radius:8px;padding:16px;\">\n      <div style=\"font-size:12px;color:#888;margin-bottom:8px;\">State B \u2014 Async (&gt;= 500 matched issues)</div>\n      <div style=\"font-size:13px;\">Click \"Export CSV\" \u2192 toast: \"Preparing export of 1,240 issues\u2026\" with a progress indicator \u2192 client polls job status \u2192 toast updates to \"Export ready\" with a Download button (signed link, valid 24h).</div>\n    </div>\n  </div>\n\n  <div style=\"margin-top:16px;font-size:12px;color:#888;\">\n    Export action is hidden/disabled for a user with no view access to the project's issues (permission-gated, matches existing project member view checks).\n  </div>\n</div>\n]]>",
+          "annotations": [],
+          "order": 0,
+          "source_type": "spec",
+          "source_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "source_title": "CSV export \u2014 backend/frontend integration points",
+          "reference_type": "direct"
+        }
+      ],
+      "architecture_designs": []
+    },
+    "resource_gate_summary": {
+      "board_id": "d72390b0-43d9-4448-883b-e5937f8e4454",
+      "entity_type": "spec",
+      "entity_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+      "resources": [
+        {
+          "resource_type": "architecture",
+          "state": "not_applicable",
+          "direct_count": 0,
+          "inherited_count": 0,
+          "total_count": 0,
+          "direct_refs": [],
+          "inherited_refs": [],
+          "na_mark": {
+            "id": "97f13147-4207-4712-b52e-50a7571ba3b2",
+            "active": true,
+            "effective": true,
+            "inherited": true,
+            "source_entity_type": "ideation",
+            "source_entity_id": "25a1a9d2-600e-4511-95fb-3326e1298b1f",
+            "justification": "No new architectural component, boundary, or integration point: the export endpoint is a single new DRF view in the existing apps/api Django app, the async path reuses Plane's existing Celery/Redis worker infrastructure verbatim, and the signed-download-link mechanism reuses the existing MinIO/S3 signed-URL pattern already used elsewhere in the codebase. Nothing here changes system topology or introduces a new service boundary that would warrant an Architecture Design.",
+            "source_channel": "mcp",
+            "created_by": "07ebd8e9-8874-4bd4-b014-bd4daedfb886",
+            "created_at": "2026-09-02T10:30:23"
+          },
+          "blocking": false,
+          "reason": null,
+          "remediation": null,
+          "authority": "blocking"
+        },
+        {
+          "resource_type": "mockup",
+          "state": "provided",
+          "direct_count": 1,
+          "inherited_count": 2,
+          "total_count": 3,
+          "direct_refs": [
+            {
+              "id": "sm_4fcfa541",
+              "title": "Issues List \u2014 Export action (sync + async states)",
+              "source_entity_type": "spec",
+              "source_entity_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+              "source_entity_title": "CSV export \u2014 backend/frontend integration points",
+              "origin_id": "sm_e58a1e0b",
+              "source_mockup_id": "sm_97fb0485"
+            }
+          ],
+          "inherited_refs": [
+            {
+              "id": "sm_97fb0485",
+              "title": "Issues List \u2014 Export action (sync + async states)",
+              "source_entity_type": "refinement",
+              "source_entity_id": "1c15a9e3-7c48-473d-abfc-4fefbdd3986b",
+              "source_entity_title": "CSV export \u2014 backend/frontend integration points",
+              "origin_id": "sm_e58a1e0b",
+              "source_mockup_id": "sm_e58a1e0b"
+            },
+            {
+              "id": "sm_e58a1e0b",
+              "title": "Issues List \u2014 Export action (sync + async states)",
+              "source_entity_type": "ideation",
+              "source_entity_id": "25a1a9d2-600e-4511-95fb-3326e1298b1f",
+              "source_entity_title": "CSV export for filtered issue views"
+            }
+          ],
+          "na_mark": null,
+          "blocking": false,
+          "reason": null,
+          "remediation": null,
+          "authority": "blocking"
+        },
+        {
+          "resource_type": "knowledge_base",
+          "state": "missing",
+          "direct_count": 0,
+          "inherited_count": 0,
+          "total_count": 0,
+          "direct_refs": [],
+          "inherited_refs": [],
+          "na_mark": null,
+          "blocking": false,
+          "reason": "advisory_missing",
+          "remediation": "Attach a Knowledge Base only when it materially improves implementation context; its absence does not block this gate.",
+          "authority": "advisory"
+        }
+      ],
+      "blocking": false,
+      "missing_resources": [],
+      "advisory_resources": [
+        {
+          "resource_type": "knowledge_base",
+          "state": "missing",
+          "direct_count": 0,
+          "inherited_count": 0,
+          "total_count": 0,
+          "direct_refs": [],
+          "inherited_refs": [],
+          "na_mark": null,
+          "blocking": false,
+          "reason": "advisory_missing",
+          "remediation": "Attach a Knowledge Base only when it materially improves implementation context; its absence does not block this gate.",
+          "authority": "advisory"
+        }
+      ],
+      "advisory_missing_resources": [
+        {
+          "resource_type": "knowledge_base",
+          "state": "missing",
+          "direct_count": 0,
+          "inherited_count": 0,
+          "total_count": 0,
+          "direct_refs": [],
+          "inherited_refs": [],
+          "na_mark": null,
+          "blocking": false,
+          "reason": "advisory_missing",
+          "remediation": "Attach a Knowledge Base only when it materially improves implementation context; its absence does not block this gate.",
+          "authority": "advisory"
+        }
+      ],
+      "authority_policy": {
+        "version": 1,
+        "context": "entity_completion",
+        "blocking_resource_types": [
+          "architecture",
+          "mockup"
+        ],
+        "advisory_resource_types": [
+          "knowledge_base"
+        ]
+      },
+      "warnings": [],
+      "architecture_findings": {
+        "owner_type": "spec",
+        "owner_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+        "design_count": 0,
+        "active_count": 0,
+        "resolved_count": 0,
+        "superseded_count": 0,
+        "by_code": {},
+        "by_design": [],
+        "top_remediation": [],
+        "blocking": false,
+        "remediation": null
+      },
+      "architecture_findings_blocking": false,
+      "architecture_propagation": {
+        "blocking": false,
+        "ineligible_sources": [],
+        "remediation": null
+      },
+      "architecture_propagation_blocking": false,
+      "resource_lineage": {
+        "contract_version": 2,
+        "owner": {
+          "entity_type": "spec",
+          "entity_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+          "title": "CSV export \u2014 backend/frontend integration points"
+        },
+        "unique_resources": [
+          {
+            "contract_version": 2,
+            "resource_type": "mockup",
+            "unique_resource_id": "mockup:sm_e58a1e0b",
+            "representative_resource_id": "sm_4fcfa541",
+            "title": "Issues List \u2014 Export action (sync + async states)",
+            "origin_evidence": {
+              "source_mockup_id": "sm_e58a1e0b",
+              "origin_id": "sm_e58a1e0b",
+              "id": "sm_e58a1e0b"
+            },
+            "attachment_count": 3,
+            "attachment_kinds": [
+              "direct",
+              "inherited_reference"
+            ],
+            "root_id": "sm_e58a1e0b",
+            "immediate_parent_id": null,
+            "source_revision": null,
+            "source_content_sha256": null,
+            "revision_stamps": [
+              {
+                "root_id": "sm_e58a1e0b",
+                "immediate_parent_id": null,
+                "source_revision": null,
+                "source_content_sha256": null
+              },
+              {
+                "root_id": "sm_e58a1e0b",
+                "immediate_parent_id": "sm_97fb0485",
+                "source_revision": null,
+                "source_content_sha256": null
+              },
+              {
+                "root_id": "sm_e58a1e0b",
+                "immediate_parent_id": "sm_e58a1e0b",
+                "source_revision": null,
+                "source_content_sha256": null
+              }
+            ]
+          }
+        ],
+        "attachments": [
+          {
+            "contract_version": 2,
+            "resource_type": "architecture",
+            "resource_id": "97f13147-4207-4712-b52e-50a7571ba3b2",
+            "id": "97f13147-4207-4712-b52e-50a7571ba3b2",
+            "title": null,
+            "unique_resource_id": "architecture:not_applicable:97f13147-4207-4712-b52e-50a7571ba3b2",
+            "attachment_kind": "not_applicable",
+            "source_entity_type": "ideation",
+            "source_entity_id": "25a1a9d2-600e-4511-95fb-3326e1298b1f",
+            "source_entity_title": null,
+            "coverage_state": "not_applicable",
+            "origin_evidence": {
+              "id": "97f13147-4207-4712-b52e-50a7571ba3b2"
+            },
+            "origin_class": null,
+            "effective": true,
+            "inherited": true,
+            "raw": {
+              "id": "97f13147-4207-4712-b52e-50a7571ba3b2",
+              "active": true,
+              "effective": true,
+              "inherited": true,
+              "source_entity_type": "ideation",
+              "source_entity_id": "25a1a9d2-600e-4511-95fb-3326e1298b1f",
+              "justification": "No new architectural component, boundary, or integration point: the export endpoint is a single new DRF view in the existing apps/api Django app, the async path reuses Plane's existing Celery/Redis worker infrastructure verbatim, and the signed-download-link mechanism reuses the existing MinIO/S3 signed-URL pattern already used elsewhere in the codebase. Nothing here changes system topology or introduces a new service boundary that would warrant an Architecture Design.",
+              "source_channel": "mcp",
+              "created_by": "07ebd8e9-8874-4bd4-b014-bd4daedfb886",
+              "created_at": "2026-09-02T10:30:23"
+            },
+            "root_id": null,
+            "immediate_parent_id": null,
+            "source_revision": null,
+            "source_content_sha256": null,
+            "revision_stamp": null
+          },
+          {
+            "contract_version": 2,
+            "resource_type": "mockup",
+            "resource_id": "sm_4fcfa541",
+            "id": "sm_4fcfa541",
+            "title": "Issues List \u2014 Export action (sync + async states)",
+            "unique_resource_id": "mockup:sm_e58a1e0b",
+            "attachment_kind": "direct",
+            "source_entity_type": "spec",
+            "source_entity_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+            "source_entity_title": "CSV export \u2014 backend/frontend integration points",
+            "coverage_state": "not_required",
+            "origin_evidence": {
+              "source_mockup_id": "sm_97fb0485",
+              "origin_id": "sm_e58a1e0b",
+              "id": "sm_4fcfa541"
+            },
+            "origin_class": null,
+            "effective": true,
+            "inherited": false,
+            "raw": {
+              "id": "sm_4fcfa541",
+              "title": "Issues List \u2014 Export action (sync + async states)",
+              "source_entity_type": "spec",
+              "source_entity_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+              "source_entity_title": "CSV export \u2014 backend/frontend integration points",
+              "origin_id": "sm_e58a1e0b",
+              "source_mockup_id": "sm_97fb0485"
+            },
+            "root_id": "sm_e58a1e0b",
+            "immediate_parent_id": "sm_97fb0485",
+            "source_revision": null,
+            "source_content_sha256": null,
+            "revision_stamp": {
+              "root_id": "sm_e58a1e0b",
+              "immediate_parent_id": "sm_97fb0485",
+              "source_revision": null,
+              "source_content_sha256": null
+            }
+          },
+          {
+            "contract_version": 2,
+            "resource_type": "mockup",
+            "resource_id": "sm_97fb0485",
+            "id": "sm_97fb0485",
+            "title": "Issues List \u2014 Export action (sync + async states)",
+            "unique_resource_id": "mockup:sm_e58a1e0b",
+            "attachment_kind": "inherited_reference",
+            "source_entity_type": "refinement",
+            "source_entity_id": "1c15a9e3-7c48-473d-abfc-4fefbdd3986b",
+            "source_entity_title": "CSV export \u2014 backend/frontend integration points",
+            "coverage_state": "not_required",
+            "origin_evidence": {
+              "source_mockup_id": "sm_e58a1e0b",
+              "origin_id": "sm_e58a1e0b",
+              "id": "sm_97fb0485"
+            },
+            "origin_class": null,
+            "effective": true,
+            "inherited": true,
+            "raw": {
+              "id": "sm_97fb0485",
+              "title": "Issues List \u2014 Export action (sync + async states)",
+              "source_entity_type": "refinement",
+              "source_entity_id": "1c15a9e3-7c48-473d-abfc-4fefbdd3986b",
+              "source_entity_title": "CSV export \u2014 backend/frontend integration points",
+              "origin_id": "sm_e58a1e0b",
+              "source_mockup_id": "sm_e58a1e0b"
+            },
+            "root_id": "sm_e58a1e0b",
+            "immediate_parent_id": "sm_e58a1e0b",
+            "source_revision": null,
+            "source_content_sha256": null,
+            "revision_stamp": {
+              "root_id": "sm_e58a1e0b",
+              "immediate_parent_id": "sm_e58a1e0b",
+              "source_revision": null,
+              "source_content_sha256": null
+            }
+          },
+          {
+            "contract_version": 2,
+            "resource_type": "mockup",
+            "resource_id": "sm_e58a1e0b",
+            "id": "sm_e58a1e0b",
+            "title": "Issues List \u2014 Export action (sync + async states)",
+            "unique_resource_id": "mockup:sm_e58a1e0b",
+            "attachment_kind": "inherited_reference",
+            "source_entity_type": "ideation",
+            "source_entity_id": "25a1a9d2-600e-4511-95fb-3326e1298b1f",
+            "source_entity_title": "CSV export for filtered issue views",
+            "coverage_state": "not_required",
+            "origin_evidence": {
+              "id": "sm_e58a1e0b"
+            },
+            "origin_class": null,
+            "effective": true,
+            "inherited": true,
+            "raw": {
+              "id": "sm_e58a1e0b",
+              "title": "Issues List \u2014 Export action (sync + async states)",
+              "source_entity_type": "ideation",
+              "source_entity_id": "25a1a9d2-600e-4511-95fb-3326e1298b1f",
+              "source_entity_title": "CSV export for filtered issue views"
+            },
+            "root_id": "sm_e58a1e0b",
+            "immediate_parent_id": null,
+            "source_revision": null,
+            "source_content_sha256": null,
+            "revision_stamp": {
+              "root_id": "sm_e58a1e0b",
+              "immediate_parent_id": null,
+              "source_revision": null,
+              "source_content_sha256": null
+            }
+          }
+        ],
+        "counts": {
+          "unique_resources_count": 1,
+          "attachment_count": 4,
+          "unique_effective_count": 1,
+          "raw_attachment_count": 4,
+          "effective_attachment_count": 4,
+          "history_attachment_count": 0,
+          "coverage_basis": "unique_effective",
+          "direct_resources_count": 1,
+          "inherited_references_count": 2,
+          "not_applicable_count": 1,
+          "covered_required_resources_count": 0,
+          "uncovered_required_resources_count": 0,
+          "dedup_groups_count": 1,
+          "by_unique_resource": [
+            {
+              "resource_type": "mockup",
+              "unique_resource_id": "mockup:sm_e58a1e0b",
+              "attachment_count": 3
+            }
+          ],
+          "by_resource_type": {
+            "architecture": {
+              "state": "not_applicable",
+              "direct_count": 0,
+              "inherited_count": 0,
+              "total_count": 0
+            },
+            "mockup": {
+              "state": "provided",
+              "direct_count": 1,
+              "inherited_count": 2,
+              "total_count": 3
+            },
+            "knowledge_base": {
+              "state": "missing",
+              "direct_count": 0,
+              "inherited_count": 0,
+              "total_count": 0
+            }
+          }
+        },
+        "resource_states": [
+          {
+            "resource_type": "architecture",
+            "state": "not_applicable",
+            "direct_count": 0,
+            "inherited_count": 0,
+            "total_count": 0,
+            "direct_refs": [],
+            "inherited_refs": [],
+            "na_mark": {
+              "id": "97f13147-4207-4712-b52e-50a7571ba3b2",
+              "active": true,
+              "effective": true,
+              "inherited": true,
+              "source_entity_type": "ideation",
+              "source_entity_id": "25a1a9d2-600e-4511-95fb-3326e1298b1f",
+              "justification": "No new architectural component, boundary, or integration point: the export endpoint is a single new DRF view in the existing apps/api Django app, the async path reuses Plane's existing Celery/Redis worker infrastructure verbatim, and the signed-download-link mechanism reuses the existing MinIO/S3 signed-URL pattern already used elsewhere in the codebase. Nothing here changes system topology or introduces a new service boundary that would warrant an Architecture Design.",
+              "source_channel": "mcp",
+              "created_by": "07ebd8e9-8874-4bd4-b014-bd4daedfb886",
+              "created_at": "2026-09-02T10:30:23"
+            },
+            "blocking": false,
+            "authority": "blocking"
+          },
+          {
+            "resource_type": "mockup",
+            "state": "provided",
+            "direct_count": 1,
+            "inherited_count": 2,
+            "total_count": 3,
+            "direct_refs": [
+              {
+                "id": "sm_4fcfa541",
+                "title": "Issues List \u2014 Export action (sync + async states)",
+                "source_entity_type": "spec",
+                "source_entity_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+                "source_entity_title": "CSV export \u2014 backend/frontend integration points",
+                "origin_id": "sm_e58a1e0b",
+                "source_mockup_id": "sm_97fb0485"
+              }
+            ],
+            "inherited_refs": [
+              {
+                "id": "sm_97fb0485",
+                "title": "Issues List \u2014 Export action (sync + async states)",
+                "source_entity_type": "refinement",
+                "source_entity_id": "1c15a9e3-7c48-473d-abfc-4fefbdd3986b",
+                "source_entity_title": "CSV export \u2014 backend/frontend integration points",
+                "origin_id": "sm_e58a1e0b",
+                "source_mockup_id": "sm_e58a1e0b"
+              },
+              {
+                "id": "sm_e58a1e0b",
+                "title": "Issues List \u2014 Export action (sync + async states)",
+                "source_entity_type": "ideation",
+                "source_entity_id": "25a1a9d2-600e-4511-95fb-3326e1298b1f",
+                "source_entity_title": "CSV export for filtered issue views"
+              }
+            ],
+            "na_mark": null,
+            "blocking": false,
+            "authority": "blocking"
+          },
+          {
+            "resource_type": "knowledge_base",
+            "state": "missing",
+            "direct_count": 0,
+            "inherited_count": 0,
+            "total_count": 0,
+            "direct_refs": [],
+            "inherited_refs": [],
+            "na_mark": null,
+            "blocking": false,
+            "authority": "advisory",
+            "reason": "advisory_missing",
+            "remediation": "Attach a Knowledge Base only when it materially improves implementation context; its absence does not block this gate."
+          }
+        ],
+        "coverage_obligations": [],
+        "uncovered_required_resources": [],
+        "advisory_coverage_resources": [],
+        "authority_policy": {
+          "version": 1,
+          "context": "entity_completion",
+          "blocking_resource_types": [
+            "architecture",
+            "mockup"
+          ],
+          "advisory_resource_types": [
+            "knowledge_base"
+          ]
+        }
+      },
+      "lineage_counts": {
+        "unique_resources_count": 1,
+        "attachment_count": 4,
+        "unique_effective_count": 1,
+        "raw_attachment_count": 4,
+        "effective_attachment_count": 4,
+        "history_attachment_count": 0,
+        "coverage_basis": "unique_effective",
+        "direct_resources_count": 1,
+        "inherited_references_count": 2,
+        "not_applicable_count": 1,
+        "covered_required_resources_count": 0,
+        "uncovered_required_resources_count": 0,
+        "dedup_groups_count": 1,
+        "by_unique_resource": [
+          {
+            "resource_type": "mockup",
+            "unique_resource_id": "mockup:sm_e58a1e0b",
+            "attachment_count": 3
+          }
+        ],
+        "by_resource_type": {
+          "architecture": {
+            "state": "not_applicable",
+            "direct_count": 0,
+            "inherited_count": 0,
+            "total_count": 0
+          },
+          "mockup": {
+            "state": "provided",
+            "direct_count": 1,
+            "inherited_count": 2,
+            "total_count": 3
+          },
+          "knowledge_base": {
+            "state": "missing",
+            "direct_count": 0,
+            "inherited_count": 0,
+            "total_count": 0
+          }
+        }
+      }
+    },
+    "coverage_summary": {
+      "ac_coverage_pct": 100,
+      "ac_covered": 6,
+      "ac_total": 6,
+      "ac_uncovered_indices": [],
+      "fr_coverage_pct": 100,
+      "fr_covered": 8,
+      "fr_total": 8,
+      "fr_uncovered_indices": [],
+      "scenario_task_linkage_pct": 100,
+      "scenarios_linked": 6,
+      "scenarios_total": 6,
+      "br_task_linkage_pct": 100,
+      "brs_linked": 6,
+      "brs_total": 6,
+      "contract_task_linkage_pct": 100,
+      "contracts_linked": 1,
+      "contracts_total": 1,
+      "tr_task_linkage_pct": 100,
+      "trs_linked": 5,
+      "trs_total": 5,
+      "decisions_coverage_pct": 100,
+      "decisions_linked": 1,
+      "decisions_total": 1,
+      "decisions_uncovered_ids": [],
+      "ir_task_linkage_pct": 100,
+      "irs_linked": 0,
+      "irs_total": 0,
+      "irs_uncovered_ids": [],
+      "or_task_linkage_pct": 100,
+      "ors_linked": 0,
+      "ors_total": 0,
+      "ors_uncovered_ids": [],
+      "cards_total": 4,
+      "cards_done": 2,
+      "cards_total_raw": 4,
+      "cards_done_raw": 2,
+      "cards_total_effective": 4,
+      "cards_done_effective": 2,
+      "skip_test_coverage": false,
+      "skip_rules_coverage": false,
+      "skip_decisions_coverage": false,
+      "skip_ir_coverage": false,
+      "skip_or_coverage": false,
+      "acceptance_criteria_total": 6,
+      "acceptance_criteria_covered": 6,
+      "uncovered_indices": [],
+      "test_scenarios_total": 6,
+      "business_rules_total": 6,
+      "api_contracts_total": 1,
+      "integration_requirements_total": 0,
+      "observability_requirements_total": 0
+    },
+    "gate_readiness": {
+      "cognitive_enforcement_active": false,
+      "cognitive_enforcement_mode": "advisory",
+      "active_gates": [],
+      "note": "Cognitive readiness is per-card; call okto_pulse_get_task_context for each card's verdict. This block does NOT aggregate card-level cognitive blocks.",
+      "mutation_allowed": false,
+      "consistency": {
+        "checked": true,
+        "mismatch": false,
+        "source": "gate_contracts"
+      },
+      "spec_dependencies": {
+        "ready": true,
+        "current_edition": 3,
+        "last_started_edition": 3,
+        "current_edition_started": true,
+        "active_dependency_count": 0,
+        "blocking_count": 0,
+        "archived_blocking_count": 0,
+        "unfinished_blocking_count": 0,
+        "blockers_truncated": false,
+        "blockers": []
+      },
+      "spec_checklist": {
+        "mode": "off",
+        "allowed": true,
+        "reason": "checklist_off",
+        "current": null,
+        "stale_reasons": [],
+        "enforcement_active": false,
+        "binding_tool": "okto_pulse_get_checklist_binding",
+        "execution_tool": "okto_pulse_start_checklist_execution",
+        "receipt_tool": "okto_pulse_get_checklist_receipt"
+      }
+    },
+    "code_traceability": {
+      "subject_type": "spec",
+      "subject_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+      "subject_version": 37,
+      "profile": "full",
+      "context_scope": "default",
+      "source_refinement_id": "1c15a9e3-7c48-473d-abfc-4fefbdd3986b",
+      "source_refinement_snapshot_id": "9e266e2b-be12-4392-90dc-e1da1fe3d0b6",
+      "source_refinement_version": 6,
+      "source_context": {
+        "delivery_context": "brownfield",
+        "delivery_context_provenance": {
+          "value": "brownfield",
+          "inherited_value": "brownfield",
+          "source_refinement_id": "1c15a9e3-7c48-473d-abfc-4fefbdd3986b",
+          "source_refinement_version": 6,
+          "override_reason": null
+        },
+        "investigation_outcome": null,
+        "role_counts": {
+          "current_implementation_count": 0,
+          "existing_scaffold_count": 0,
+          "existing_constraint_count": 0,
+          "reference_pattern_count": 0,
+          "uncategorized_legacy_count": 0
+        },
+        "classification_state": {
+          "classified_count": 0,
+          "uncategorized_legacy_count": 0
+        },
+        "evidence_applicable": null,
+        "interpretation_rule": "Only current implementation Evidence represents existing delivered behavior; all other source roles provide context only.",
+        "items_not_current_implementation_count": 0,
+        "technical_details_available": false
+      },
+      "source_context_items": [],
+      "source_context_classification_inputs": [],
+      "contextual_evidence_coverage": {
+        "total": 0,
+        "linked": 0,
+        "dispositioned": 0,
+        "pending": 0,
+        "pending_ids": [],
+        "unresolved_applicability_count": 0,
+        "coverage_pct": null,
+        "projection_complete": true
+      },
+      "obligation_evidence_mappings": [],
+      "referenced_evidence_ids": [],
+      "gate_readiness": {
+        "mode": "advisory",
+        "phases": [
+          "spec_evidence_disposition"
+        ],
+        "allowed": true,
+        "passed": true,
+        "blockers": [],
+        "evidence_disposition_coverage": {
+          "total": 0,
+          "linked": 0,
+          "dispositioned": 0,
+          "pending": 0,
+          "pending_ids": [],
+          "coverage_pct": 100
+        },
+        "evidence_coverage_skipped": false,
+        "target_entity_coverage": {
+          "total": 0,
+          "covered": 0,
+          "pending": 0,
+          "pending_entity_ids": [],
+          "coverage_pct": 100
+        },
+        "receipt_currentness": {},
+        "resolution_freshness": {}
+      },
+      "heads": [],
+      "receipts": [],
+      "receipt_revocations": [],
+      "evidence": [],
+      "inherited_evidence": [],
+      "direct_evidence": [],
+      "links": [],
+      "dispositions": [],
+      "targets": [],
+      "target_spec_links": [],
+      "target_evidence_links": [],
+      "resolutions": [],
+      "executions": [],
+      "overlaps": [],
+      "waivers": [],
+      "counts": {
+        "heads": 0,
+        "receipts": 0,
+        "evidence": 0,
+        "source_context_items": 0,
+        "links": 0,
+        "dispositions": 0,
+        "targets": 0,
+        "resolutions": 0,
+        "executions": 0,
+        "overlaps": 0,
+        "waivers": 0
+      },
+      "coverage": {
+        "total": 0,
+        "linked": 0,
+        "dispositioned": 0,
+        "pending": 0,
+        "pending_ids": [],
+        "coverage_pct": 100,
+        "skipped": false
+      },
+      "target_coverage": {
+        "total": 0,
+        "covered": 0,
+        "pending": 0,
+        "pending_entity_ids": [],
+        "coverage_pct": 100
+      },
+      "resolution_freshness": {}
+    }
+  },
+  "error_code": null,
+  "message": null,
+  "retryable": false,
+  "next_action": null,
+  "meta": {
+    "contract": "okto-pulse.mcp-tool-outcome",
+    "contract_version": "2.0",
+    "tool": "okto_pulse_get_spec_context"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "workspace_id": "22e4eda056f51578b825531b3641af80a283e2b0bb790453b96d231222979ea9",
+  "workspace_display_name": "okto-plane-handoff-demo",
+  "project_root": "/Users/apple/Infrasity/okto-plane-handoff-demo/plane",
+  "exported_at": "2026-09-02T11:56:00Z",
+  "note": "Handoff creation was sent as `local-agent` (not `backend-agent`) due to a Claude Code MCP client identity-caching bug that prevented reconnecting to the backend-agent api key mid-session — logged in session.opened's payload.metadata as a disclosed limitation. Claim and complete DID use the correct frontend-agent identity, established via a direct HTTP MCP call as a workaround.",
+  "events": [
+    {
+      "event_id": 1,
+      "type": "session.opened",
+      "actor_agent_id": "local-agent",
+      "created_at": "2026-09-02T11:13:19.437426Z",
+      "payload": {
+        "session_id": "ses_6717fdaa8fea4759945282b9e9b3bbbe",
+        "metadata": {
+          "role_in_demo": "backend-agent",
+          "note": "connected as local-agent due to a Claude Code MCP client identity-caching bug"
+        }
+      }
+    },
+    {
+      "event_id": 2,
+      "type": "handoff.created",
+      "actor_agent_id": "local-agent",
+      "created_at": "2026-09-02T11:13:33.496797Z",
+      "handoff_id": "hof_87cd0b965b3f4f74a4f52ade84e2dd45",
+      "payload": {
+        "status": "OPEN",
+        "from_agent_id": "local-agent",
+        "target": { "strategy": "direct", "agent_id": "frontend-agent" },
+        "visibility": "public"
+      }
+    },
+    {
+      "event_id": 3,
+      "type": "session.opened",
+      "actor_agent_id": "frontend-agent",
+      "created_at": "2026-09-02T11:24:34.417477Z",
+      "payload": { "session_id": "ses_af0650f774bc4f2fb268c57345428bc4" }
+    },
+    {
+      "event_id": 4,
+      "type": "handoff.claimed",
+      "actor_agent_id": "frontend-agent",
+      "created_at": "2026-09-02T11:24:46.719458Z",
+      "handoff_id": "hof_87cd0b965b3f4f74a4f52ade84e2dd45",
+      "payload": {
+        "status": "CLAIMED",
+        "claimed_by": "frontend-agent",
+        "lease_expires_at": "2026-09-02T11:29:46.715028Z"
+      }
+    },
+    {
+      "event_id": 5,
+      "type": "handoff.completed",
+      "actor_agent_id": "frontend-agent",
+      "created_at": "2026-09-02T11:25:08.316044Z",
+      "handoff_id": "hof_87cd0b965b3f4f74a4f52ade84e2dd45",
+      "payload": {
+        "status": "COMPLETED",
+        "result": {
+          "summary": "Frontend Export CSV action implemented against the contract, with one real correction discovered during implementation.",
+          "contract_correction": "rich_filters.filters is NOT the legacy flat field-name shape described in the handoff payload notes. The Issues List view's actual richFilters store already produces the JSON filter-tree shape ComplexFilterBackend natively consumes. Backend commit was amended (aac6565a01) to validate/apply this tree directly.",
+          "commit": "c3a8db3d73",
+          "files_changed": [
+            "apps/web/core/components/issues/export-csv-action.tsx",
+            "apps/web/core/components/issues/header.tsx"
+          ],
+          "verification": "Full workspace pnpm run check:types passes clean (exit 0). No Playwright/e2e harness existed in this repo at the time — real, disclosed gap that led to the frontend card's honest task-validation rejection (completeness 78 < 80)."
+        }
+      }
+    }
+  ]
+}

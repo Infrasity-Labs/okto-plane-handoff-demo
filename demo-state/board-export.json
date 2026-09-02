@@ -1,0 +1,52 @@
+{
+  "board_id": "d72390b0-43d9-4448-883b-e5937f8e4454",
+  "board_name": "My Board",
+  "exported_at": "2026-09-02T11:55:00Z",
+  "pulse_endpoint": "http://127.0.0.1:8100 (MCP :8101)",
+  "lineage": {
+    "ideation_id": "25a1a9d2-600e-4511-95fb-3326e1298b1f",
+    "ideation_title": "CSV export for filtered issue views",
+    "ideation_status": "done",
+    "refinement_id": "1c15a9e3-7c48-473d-abfc-4fefbdd3986b",
+    "refinement_title": "CSV export — backend/frontend integration points",
+    "refinement_status": "done",
+    "spec_id": "e4720b70-f539-44fa-8f2f-b4cf140d9f3a",
+    "spec_status": "in_progress",
+    "spec_edition": 3,
+    "sprint_id": "00539a6f-65a8-463f-ab1c-35b74149a422",
+    "sprint_title": "CSV export — filter-aware exporter extension",
+    "sprint_status": "active"
+  },
+  "cards": [
+    {
+      "id": "20960449-5812-4e63-a3c6-f31b76996396",
+      "title": "Backend: wire rich_filters into ExportIssuesEndpoint / issue_export_task",
+      "status": "done",
+      "labels": ["backend", "apps/api"]
+    },
+    {
+      "id": "b7bdccfc-7040-4847-a9fc-00dcbd363e24",
+      "title": "Test: backend filter/permission/compat coverage",
+      "status": "done",
+      "labels": ["backend", "test", "pytest"]
+    },
+    {
+      "id": "bb89c680-ce53-4638-8d0c-ee7e3253fa90",
+      "title": "Frontend: Export CSV action on Issues List toolbar",
+      "status": "rejected",
+      "labels": ["frontend", "apps/web"],
+      "rejection_reason": "task_validation_failed: completeness 78 < min 80 (no e2e harness existed in the repo at implementation time; Playwright was added afterward but hit an environment-level rate-limit blocker before evidence could be captured)"
+    },
+    {
+      "id": "2df57f0c-07e1-4c86-9fd2-52c96f050c27",
+      "title": "Test: frontend permission gating + polling UX",
+      "status": "not_started",
+      "labels": ["frontend", "test", "playwright"]
+    }
+  ],
+  "known_gaps_for_continuation": [
+    "Frontend card is `rejected` in Pulse — needs okto_pulse_move_card(status=\"in_progress\") then a fresh task validation once e2e evidence exists.",
+    "apps/web/e2e/export-csv.spec.ts exists and is real, but its one run against the live stack was blocked by a persistent 429 from AuthenticationThrottle (plane/authentication/rate_limit.py, 10/minute, IP-scoped) that did not clear even after 80s+ of zero traffic — likely needs a direct Redis cache-key reset (see docs/walkthrough.md) rather than more waiting.",
+    "Once e2e evidence is captured, update the frontend test card (2df57f0c) scenario statuses via okto_pulse_update_test_scenario_status, then move both frontend cards to done and re-run the sprint→spec→done chain."
+  ]
+}
