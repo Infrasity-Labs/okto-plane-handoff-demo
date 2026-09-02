@@ -118,7 +118,7 @@ for `session_open`/`handoff_claim`/`handoff_complete`, while `handoff_create`
 itself ran under the stuck `local-agent` identity (disclosed in the event
 log's `session.opened` metadata).
 
-Real trail (`.nexus/event-log-export.json`): `handoff_create` (local-agent,
+Real trail (`demo-state/nexus-event-log.json`): `handoff_create` (local-agent,
 API contract as payload) → `session_open` (frontend-agent, via curl) →
 `handoff_claim` (frontend-agent) → `handoff_complete` (frontend-agent, with
 the contract-correction result attached).
