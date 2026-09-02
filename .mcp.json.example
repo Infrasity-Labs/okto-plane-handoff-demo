@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "okto-pulse": {
+      "type": "http",
+      "url": "http://127.0.0.1:8101/mcp?api_key=dash_<your-pulse-agent-key>"
+    },
+    "okto-nexus": {
+      "type": "http",
+      "url": "http://127.0.0.1:8202/mcp?api_key=nxs_<your-nexus-agent-key>"
+    }
+  }
+}

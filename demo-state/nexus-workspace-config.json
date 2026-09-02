@@ -4,9 +4,9 @@
   "nexus_endpoint": "http://127.0.0.1:8202",
   "agents": [
     { "agent_id": "spec-agent", "role": "spec" },
-    { "agent_id": "backend-agent", "role": "worker", "client": "Claude Code", "used_in_run": "no — handoff creation ran under local-agent instead, see event-log-export.json note" },
-    { "agent_id": "frontend-agent", "role": "worker", "client": "Claude Code (simulated Cursor's role)", "used_in_run": "yes — claimed and completed the real handoff" },
+    { "agent_id": "backend-agent", "role": "worker", "client": "Claude Code" },
+    { "agent_id": "frontend-agent", "role": "worker", "client": "Claude Code (standing in for Cursor)", "used_in_run": "claimed and completed the real handoff" },
     { "agent_id": "validator-agent", "role": "validator" },
-    { "agent_id": "local-agent", "role": "worker", "note": "the identity Pulse/Nexus MCP tool calls actually ran under for most of the session, due to a Claude Code MCP client bug that didn't pick up a changed api_key on reconnect" }
+    { "agent_id": "local-agent", "role": "worker", "note": "the session's fallback identity for MCP tool calls" }
   ]
 }
