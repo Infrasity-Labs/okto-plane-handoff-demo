@@ -164,20 +164,7 @@ The real state behind this run is in [`demo-state/`](demo-state/): see [`demo-st
 ## Architecture
 
 <div align="center">
-
-```mermaid
-graph TD
-    A["Agent Client"] --> B["Okto Pulse<br/>:8100 / :8101"]
-    A --> C["Okto Nexus<br/>:8202"]
-    B -->|governs WHAT| D[("plane/ fork")]
-    C -->|governs WHO, WHEN| D
-
-    style A fill:#1d4ed8,stroke:#172554,color:#ffffff
-    style B fill:#0891b2,stroke:#083344,color:#ffffff
-    style C fill:#7c3aed,stroke:#2e1065,color:#ffffff
-    style D fill:#15803d,stroke:#052e16,color:#ffffff
-```
-
+  <img src="docs/images/architecture-diagram.svg" alt="Agent Client connects to Okto Pulse and Okto Nexus over MCP; Pulse governs what gets built, Nexus governs who acts and when, both against the same plane/ fork" width="480">
 </div>
 
 Pulse and Nexus share no code, config, or service; the only connection is this one agent client holding both MCP server URLs simultaneously, working against the same `plane/` checkout. See [`docs/architecture.md`](docs/architecture.md) for the full breakdown, including the exact integration points inside Plane's own code.
@@ -386,14 +373,6 @@ Contributions welcome via PR against [Infrasity-Labs/okto-plane-handoff-demo](ht
 | [Infrasity-Labs/nexus-brownfield-use-case](https://github.com/Infrasity-Labs/nexus-brownfield-use-case) | Reference repo for Nexus alone: two agents racing a policy-gated migration handoff |
 | [makeplane/plane](https://github.com/makeplane/plane) | The upstream project this demo's `plane/` fork is based on |
 | [Okto Labs documentation](https://docs.oktolabs.ai) | Full docs for both products |
-
-<br/>
-
----
-
-## Conclusion
-
-Built on [Okto Pulse](https://github.com/OktoLabsAI/okto-pulse) and [Okto Nexus](https://github.com/OktoLabsAI/okto-nexus), both OktoLabs products. Structural separation between what gets built, what counts as proof it works, and who's allowed to touch it next, enforced by the tools themselves.
 
 <br/>
 
