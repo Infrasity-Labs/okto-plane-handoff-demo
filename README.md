@@ -48,7 +48,9 @@
     <a href="#running-the-target-app-plane"><b>Running Plane</b></a> &nbsp;·&nbsp;
     <a href="#stages-as-actually-run"><b>Stages</b></a> &nbsp;·&nbsp;
     <a href="#where-to-find-artifacts"><b>Artifacts</b></a> &nbsp;·&nbsp;
-    <a href="#whats-next"><b>What's Next</b></a>
+    <a href="#whats-next"><b>What's Next</b></a> &nbsp;·&nbsp;
+    <a href="#security"><b>Security</b></a> &nbsp;·&nbsp;
+    <a href="#related"><b>Related</b></a>
   </p>
 </div>
 
@@ -123,35 +125,37 @@ The real state behind this run is in [`demo-state/`](demo-state/): see [`demo-st
 - **The real Nexus handoff**: `handoff_create` → `handoff_claim` → `handoff_complete`, with the actual contract-refinement result payload the frontend agent reported back
 - **The registered Nexus agent roster**: `spec-agent`, `backend-agent`, `frontend-agent`, `validator-agent`
 
-**Pulse: Ideation, done.** Scope evaluated (Domains 2, Dependencies 1), ambiguity-killer Q&A resolved, ready for refinement.
+**Pulse: Ideation and Refinement, both done.** Scope evaluated (Domains 2, Dependencies 1), ambiguity-killer Q&A resolved on the left; the real codebase investigation that superseded three of the ideation's assumptions on the right.
 
-<div align="center">
-  <img src="docs/images/screenshots/pulse-ideation.png" alt="Pulse Ideations tab: CSV export for filtered issue views, Done, Medium complexity, 3 open Q&A" width="90%">
-</div>
-
-**Pulse: Refinement, done.** The real codebase investigation that superseded three of the ideation's assumptions.
-
-<div align="center">
-  <img src="docs/images/screenshots/pulse-refinement.png" alt="Pulse Refinements tab: CSV export, backend/frontend integration points, Done, Edition 1" width="90%">
-</div>
+<table>
+<tr>
+<td width="50%" align="center"><sub><b>Ideations tab</b></sub></td>
+<td width="50%" align="center"><sub><b>Refinements tab</b></sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/images/screenshots/pulse-ideation.png" alt="Pulse Ideations tab: CSV export for filtered issue views, Done, Medium complexity, 3 open Q&A"></td>
+<td width="50%"><img src="docs/images/screenshots/pulse-refinement.png" alt="Pulse Refinements tab: CSV export, backend/frontend integration points, Done, Edition 1"></td>
+</tr>
+</table>
 
 **Pulse: Spec, in progress.** Validated, content-locked, Requirement Lint at 0 defects, decomposed into the active sprint's 4 cards.
 
 <div align="center">
-  <img src="docs/images/screenshots/pulse-spec.png" alt="Pulse Specs tab: CSV export, backend/frontend integration points, In Progress, Edition 3, Requirement lint 0" width="90%">
+  <img src="docs/images/screenshots/pulse-spec.png" alt="Pulse Specs tab: CSV export, backend/frontend integration points, In Progress, Edition 3, Requirement lint 0" width="70%">
 </div>
 
-**Nexus: coordination graph.** `frontend-agent` and the session's fallback `local-agent` identity show real handoff activity; `spec-agent`, `backend-agent`, and `validator-agent` are registered but show no Nexus activity, because their work happened entirely on Pulse's side. Nexus only governs the one backend→frontend handoff in this run, and even that got created under `local-agent` rather than `backend-agent` due to an MCP session-reconnect quirk (see `docs/walkthrough.md`).
+**Nexus: the coordination graph and the real handoff, completed.** `frontend-agent` and the session's fallback `local-agent` identity show real handoff activity on the left; `spec-agent`, `backend-agent`, and `validator-agent` are registered but show no Nexus activity, because their work happened entirely on Pulse's side. Nexus only governs the one backend→frontend handoff in this run, and even that got created under `local-agent` rather than `backend-agent` due to an MCP session-reconnect quirk (see `docs/walkthrough.md`). The handoff detail on the right shows the real API contract payload and the contract refinement reported back on completion.
 
-<div align="center">
-  <img src="docs/images/screenshots/nexus-graph.png" alt="Nexus coordination graph: operator, frontend-agent, local-agent, validator-agent, and backend-agent nodes, most showing no recent activity" width="90%">
-</div>
-
-**Nexus: the real handoff, completed.** `local-agent` → `frontend-agent`, with the actual API contract payload and the contract refinement reported back on completion.
-
-<div align="center">
-  <img src="docs/images/screenshots/nexus-handoff-detail.png" alt="Nexus handoff detail: hof_87cd0b965b3f4f74a4f52ade84e2dd45, COMPLETED, claimed by frontend-agent, real API contract payload" width="90%">
-</div>
+<table>
+<tr>
+<td width="50%" align="center"><sub><b>Coordination graph</b></sub></td>
+<td width="50%" align="center"><sub><b>Handoff detail, COMPLETED</b></sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="docs/images/screenshots/nexus-graph.png" alt="Nexus coordination graph: operator, frontend-agent, local-agent, validator-agent, and backend-agent nodes, most showing no recent activity"></td>
+<td width="50%"><img src="docs/images/screenshots/nexus-handoff-detail.png" alt="Nexus handoff detail: hof_87cd0b965b3f4f74a4f52ade84e2dd45, COMPLETED, claimed by frontend-agent, real API contract payload"></td>
+</tr>
+</table>
 
 <br/>
 
@@ -269,6 +273,9 @@ cp .env.example .env
 cp .mcp.json.example .mcp.json   # fill in real agent keys after registering them
 ```
 
+> [!NOTE]
+> `.mcp.json` needs real `dash_...` (Pulse) and `nxs_...` (Nexus) agent keys, not the placeholders in `.mcp.json.example`. You won't have those until agents are registered in step 3, so come back and fill this in afterward.
+
 ### 3. Bring up the stack
 
 ```bash
@@ -276,6 +283,9 @@ cp .mcp.json.example .mcp.json   # fill in real agent keys after registering the
 ```
 
 This scaffolds Plane's env files, brings up its docker-compose stack, and starts Pulse and Nexus pointed at the embedded `plane/` checkout.
+
+> [!NOTE]
+> Requires Docker Desktop (or an equivalent daemon) already running. `scripts/00_setup.sh` fails fast with a clear message if it isn't.
 
 ### 4. Seed the Pulse board
 
@@ -285,7 +295,10 @@ Once `okto-pulse serve` has printed its first-boot API key, seed the board to th
 python3 scripts/01_seed_pulse_board.py --api-key dash_<your-pulse-agent-key>
 ```
 
-This replays the same final field values (requirements, business rules, the API contract, decision, test scenarios, mockup, card statuses) through the real Pulse MCP tool calls: see [`demo-state/README.md`](demo-state/README.md) for exactly what it does and doesn't cover. It does **not** register or connect Nexus agents, and does not replay the Nexus handoff event log: do that yourself per [`docs/walkthrough.md`](docs/walkthrough.md)'s "Nexus handoff" section, the same as the original run did. Run it exactly once against a fresh board; it has no idempotency guard.
+This replays the same final field values (requirements, business rules, the API contract, decision, test scenarios, mockup, card statuses) through the real Pulse MCP tool calls: see [`demo-state/README.md`](demo-state/README.md) for exactly what it does and doesn't cover. It does **not** register or connect Nexus agents, and does not replay the Nexus handoff event log: do that yourself per [`docs/walkthrough.md`](docs/walkthrough.md)'s "Nexus handoff" section, the same as the original run did.
+
+> [!WARNING]
+> Run this exactly once against a fresh board. It has no idempotency guard; a second run creates a second copy of every entity.
 
 <br/>
 
@@ -332,7 +345,7 @@ open http://127.0.0.1:8202    # Nexus dashboard
 - [`docs/walkthrough.md`](docs/walkthrough.md): stage-by-stage instructions and the full MCP call trace
 - [`docs/prompts/`](docs/prompts/): the actual prompt for each stage
 - [`docs/decisions/`](docs/decisions/): the real decisions made along the way
-- `plane/`: the forked app itself, branch `feature/issue-csv-export`, also pushed standalone to [`yuvicodesgit/plane`](https://github.com/yuvicodesgit/plane)
+- `plane/`: the forked app itself, branch `feature/issue-csv-export`
 
 <br/>
 
@@ -351,6 +364,19 @@ This run is captured at roughly the halfway point on purpose; there's real work 
 
 ---
 
+## Security
+
+> [!WARNING]
+> Never commit `.env` or `.mcp.json` with real keys filled in. Both are covered by `.gitignore`; commit only the `.env.example` / `.mcp.json.example` templates.
+
+- Rotate any `dash_...` (Pulse) or `nxs_...` (Nexus) agent key that appears in terminal output, git history, or chat exports.
+- Pulse (`:8100`/`:8101`) and Nexus (`:8202`) bind to `127.0.0.1` by default in this setup; don't expose them beyond localhost without adding your own auth in front.
+- To purge a committed secret from git history: `git filter-repo --invert-paths --path .env` then force-push.
+
+<br/>
+
+---
+
 ## Contributing & Licensing
 
 This repo's own content (docs, scripts, demo-state) is licensed under the [Elastic License 2.0](LICENSE), matching Okto Pulse and Okto Nexus. The embedded `plane/` directory is a fork of [`makeplane/plane`](https://github.com/makeplane/plane) and retains its own AGPL-3.0 license: see `plane/LICENSE.md`.
@@ -358,6 +384,20 @@ This repo's own content (docs, scripts, demo-state) is licensed under the [Elast
 To reproduce or iterate: fork this repo, run `scripts/00_setup.sh` and `scripts/01_seed_pulse_board.py` against your own Pulse instance, connect your own Backend and Frontend agents to your own Nexus instance.
 
 Contributions welcome via PR against [Infrasity-Labs/okto-plane-handoff-demo](https://github.com/Infrasity-Labs/okto-plane-handoff-demo).
+
+<br/>
+
+---
+
+## Related
+
+| Project | Description |
+| :--- | :--- |
+| [OktoLabsAI/okto-pulse](https://github.com/OktoLabsAI/okto-pulse) | Okto Pulse open source (Elastic License 2.0) |
+| [OktoLabsAI/okto-nexus](https://github.com/OktoLabsAI/okto-nexus) | Okto Nexus open source (Elastic License 2.0) |
+| [Infrasity-Labs/nexus-brownfield-use-case](https://github.com/Infrasity-Labs/nexus-brownfield-use-case) | Reference repo for Nexus alone: two agents racing a policy-gated migration handoff |
+| [makeplane/plane](https://github.com/makeplane/plane) | The upstream project this demo's `plane/` fork is based on |
+| [Okto Labs documentation](https://docs.oktolabs.ai) | Full docs for both products |
 
 <br/>
 
