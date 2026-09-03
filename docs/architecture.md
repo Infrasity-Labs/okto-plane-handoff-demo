@@ -82,7 +82,7 @@ upstream:
 - The shipped local `.env` defaults (`USE_MINIO=0`,
   `AWS_S3_ENDPOINT_URL=http://localhost:9000`) point the async export
   pipeline at an endpoint that isn't reachable from inside the
-  `api`/`worker` containers — `scripts/setup.sh` applies the container-
+  `api`/`worker` containers — `scripts/00_setup.sh` applies the container-
   network-correct values automatically.
 
 ## Test coverage

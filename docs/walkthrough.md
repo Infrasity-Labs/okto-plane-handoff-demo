@@ -168,7 +168,7 @@ Building the missing e2e coverage, in order:
 5. Also corrected, independently: the local `.env`'s `USE_MINIO=0` /
    `AWS_S3_ENDPOINT_URL=http://localhost:9000` defaults, neither reachable
    from inside the `api`/`worker` containers — updated to `USE_MINIO=1` /
-   `http://plane-minio:9000` (now scripted in `scripts/setup.sh`).
+   `http://plane-minio:9000` (now scripted in `scripts/00_setup.sh`).
 6. Re-ran the real export end to end: **`status: "completed"`**, a valid
    signed URL with the correct 7-day expiry
    (`X-Amz-Expires=604800`), confirming the technical requirement that
