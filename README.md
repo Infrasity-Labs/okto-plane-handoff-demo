@@ -59,6 +59,26 @@ The real state behind this run is in [`demo-state/`](demo-state/) — see [`demo
 - **The real Nexus handoff** — `handoff_create` → `handoff_claim` → `handoff_complete`, with the actual contract-refinement result payload the frontend agent reported back
 - **The registered Nexus agent roster** — `spec-agent`, `backend-agent`, `frontend-agent`, `validator-agent`
 
+**Pulse — Ideation, done.** Scope evaluated (Domains 2, Dependencies 1), ambiguity-killer Q&A resolved, ready for refinement.
+
+![Pulse Ideations tab: "CSV export for filtered issue views", Done, Medium complexity, 3 open Q&A](docs/images/screenshots/pulse-ideation.png)
+
+**Pulse — Refinement, done.** The real codebase investigation that superseded three of the ideation's assumptions.
+
+![Pulse Refinements tab: "CSV export — backend/frontend integration points", Done, Edition 1](docs/images/screenshots/pulse-refinement.png)
+
+**Pulse — Spec, in progress.** Validated, content-locked, Requirement Lint at 0 defects, decomposed into the active sprint's 4 cards.
+
+![Pulse Specs tab: "CSV export — backend/frontend integration points", In Progress, Edition 3, Requirement lint 0](docs/images/screenshots/pulse-spec.png)
+
+**Nexus — coordination graph.** `frontend-agent` and the session's fallback `local-agent` identity show real handoff activity; `spec-agent`, `backend-agent`, and `validator-agent` are registered but show no Nexus activity because their work happened entirely on Pulse's side — Nexus only governs the one backend→frontend handoff in this run, and even that got created under `local-agent` rather than `backend-agent` due to an MCP session-reconnect quirk (see `docs/walkthrough.md`).
+
+![Nexus coordination graph: operator, frontend-agent, local-agent, validator-agent, and backend-agent nodes, most showing no recent activity](docs/images/screenshots/nexus-graph.png)
+
+**Nexus — the real handoff, completed.** `local-agent` → `frontend-agent`, with the actual API contract payload and the contract refinement reported back on completion.
+
+![Nexus handoff detail: hof_87cd0b965b3f4f74a4f52ade84e2dd45, COMPLETED, claimed by frontend-agent, real API contract payload](docs/images/screenshots/nexus-handoff-detail.png)
+
 ## Architecture
 
 ```mermaid
@@ -113,6 +133,7 @@ flowchart TD
 | `docs/decisions/` | Real decisions made during the run |
 | `docs/prompts/` | The actual prompt used at each stage — see [`docs/prompts/README.md`](docs/prompts/README.md) |
 | `docs/images/` | Banner + architecture diagram assets |
+| `docs/images/screenshots/` | Real Pulse + Nexus dashboard screenshots, embedded in [Pulse + Nexus in Action](#pulse--nexus-in-action) |
 | `scripts/00_setup.sh` | Bootstrap: Plane + Pulse + Nexus, one command |
 | `scripts/01_seed_pulse_board.py` | Seeds a fresh Pulse install to this repo's halfway-point board state |
 | `scripts/requirements.txt` | Python deps for the scripts above |
