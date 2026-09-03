@@ -166,28 +166,16 @@ The real state behind this run is in [`demo-state/`](demo-state/): see [`demo-st
 <div align="center">
 
 ```mermaid
-graph LR
-    Client["Agent Client<br/>(Claude Code)"]
+graph TD
+    A["Agent Client"] --> B["Okto Pulse<br/>:8100 / :8101"]
+    A --> C["Okto Nexus<br/>:8202"]
+    B -->|governs WHAT| D[("plane/ fork")]
+    C -->|governs WHO, WHEN| D
 
-    subgraph Pulse["Okto Pulse"]
-        PulseAPI["Dashboard + MCP<br/>:8100 / :8101"]
-    end
-
-    subgraph Nexus["Okto Nexus"]
-        NexusAPI["Dashboard + MCP<br/>:8202"]
-    end
-
-    Plane[("plane/ fork<br/>Django API + React web")]
-
-    Client -->|MCP| PulseAPI
-    Client -->|MCP| NexusAPI
-    PulseAPI -->|governs WHAT gets built| Plane
-    NexusAPI -->|governs WHO acts, WHEN| Plane
-
-    style Client fill:#1d4ed8,stroke:#172554,color:#ffffff
-    style PulseAPI fill:#0891b2,stroke:#083344,color:#ffffff
-    style NexusAPI fill:#7c3aed,stroke:#2e1065,color:#ffffff
-    style Plane fill:#15803d,stroke:#052e16,color:#ffffff
+    style A fill:#1d4ed8,stroke:#172554,color:#ffffff
+    style B fill:#0891b2,stroke:#083344,color:#ffffff
+    style C fill:#7c3aed,stroke:#2e1065,color:#ffffff
+    style D fill:#15803d,stroke:#052e16,color:#ffffff
 ```
 
 </div>
