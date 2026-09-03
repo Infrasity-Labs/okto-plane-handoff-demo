@@ -164,7 +164,7 @@ The real state behind this run is in [`demo-state/`](demo-state/): see [`demo-st
 ## Architecture
 
 <div align="center">
-  <img src="docs/images/architecture-diagram.svg" alt="Agent Client connects to Okto Pulse and Okto Nexus over MCP; Pulse governs what gets built, Nexus governs who acts and when, both against the same plane/ fork" width="480">
+  <img src="docs/images/architecture-diagram.svg" alt="Agent Client connects to Okto Pulse and Okto Nexus over MCP; Pulse owns ideation through task validation, Nexus owns the handoff create/claim/complete trail, both against the same plane/ fork checkout" width="640">
 </div>
 
 Pulse and Nexus share no code, config, or service; the only connection is this one agent client holding both MCP server URLs simultaneously, working against the same `plane/` checkout. See [`docs/architecture.md`](docs/architecture.md) for the full breakdown, including the exact integration points inside Plane's own code.
