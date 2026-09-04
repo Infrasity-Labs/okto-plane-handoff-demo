@@ -328,13 +328,11 @@ open http://127.0.0.1:8202    # Nexus dashboard
 
 ## What's Next
 
-This run is captured at roughly the halfway point on purpose; there's real work here for whoever picks it up:
+This run is captured at roughly the halfway point on purpose; steps for moving ahead:
 
 - [ ] Complete the Playwright e2e pass for the Frontend card's two test scenarios (permission-gated visibility, completed/failed polling states). The suite is written and committed (`plane/apps/web/e2e/export-csv.spec.ts`); see `docs/decisions/04-scoping-the-remaining-e2e-pass.md` for the exact next step.
 - [ ] Resubmit the Frontend card's task validation once that evidence exists, and move it to `done`.
 - [ ] Close the Sprint and Spec once both implementation cards are `done`.
-- [ ] Open the real PR to `makeplane/plane`: the feature itself, plus two independent local-environment improvements found along the way (see `docs/architecture.md`).
-
 <br/>
 
 ---
