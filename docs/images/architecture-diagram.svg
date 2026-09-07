@@ -1,12 +1,21 @@
-<svg width="720" height="870" viewBox="0 0 720 870" xmlns="http://www.w3.org/2000/svg">
+<svg width="720" height="950" viewBox="0 0 720 950" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#0f172a"/>
       <stop offset="100%" stop-color="#1e293b"/>
     </linearGradient>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#475569"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#fb923c"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#a855f7"/>
+    </marker>
   </defs>
 
-  <rect width="720" height="870" fill="url(#bg)"/>
+  <rect width="720" height="950" fill="url(#bg)"/>
 
   <!-- header -->
   <text x="360" y="34" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="18" font-weight="700" fill="#f8fafc">One Claude Code session, four named agent identities</text>
@@ -29,127 +38,148 @@
 
   <line x1="40" y1="120" x2="680" y2="120" stroke="#334155" stroke-width="1"/>
 
+  <!-- pipeline arrows: stage N box-bottom -> stage N+1 box-top, left rail -->
+  <g stroke="#475569" stroke-width="2" fill="none" marker-end="url(#arrow-gray)">
+    <line x1="64" y1="197" x2="64" y2="213"/>
+    <line x1="64" y1="273" x2="64" y2="289"/>
+    <line x1="64" y1="349" x2="64" y2="365"/>
+    <line x1="64" y1="425" x2="64" y2="441"/>
+    <line x1="64" y1="501" x2="64" y2="517"/>
+    <line x1="64" y1="577" x2="64" y2="593"/>
+    <line x1="64" y1="653" x2="64" y2="669"/>
+    <line x1="64" y1="729" x2="64" y2="745"/>
+    <line x1="64" y1="805" x2="64" y2="821"/>
+  </g>
+
+  <!-- identity handoff arrows: backend-agent chip -> Nexus chip -> frontend-agent chip, right rail -->
+  <g stroke-width="2" fill="none">
+    <line x1="612" y1="551" x2="612" y2="592" stroke="#fb923c" marker-end="url(#arrow-orange)"/>
+    <line x1="612" y1="627" x2="612" y2="668" stroke="#a855f7" marker-end="url(#arrow-purple)"/>
+  </g>
+  <text x="632" y="574" font-family="-apple-system,sans-serif" font-size="8.5" fill="#fb923c">hands off</text>
+  <text x="632" y="650" font-family="-apple-system,sans-serif" font-size="8.5" fill="#a855f7">delivers to</text>
+
   <!-- Stage 0: Setup -->
   <g>
-    <rect x="40" y="132" width="640" height="58" rx="8" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
-    <circle cx="64" cy="161" r="14" fill="#64748b"/>
-    <text x="64" y="166" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="14" font-weight="700" fill="#0f172a">0</text>
-    <text x="92" y="154" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Setup</text>
-    <text x="92" y="172" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Fork + scaffold Plane's stack; register Pulse/Nexus identities</text>
-    <rect x="552" y="141" width="120" height="20" rx="10" fill="#0f172a" stroke="#64748b" stroke-width="1.5"/>
-    <text x="612" y="155" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#64748b">operator</text>
-    <text x="612" y="178" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">plane/ + Pulse + Nexus</text>
+    <rect x="40" y="140" width="640" height="54" rx="8" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+    <circle cx="64" cy="167" r="13" fill="#64748b"/>
+    <text x="64" y="172" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">0</text>
+    <text x="92" y="161" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Setup</text>
+    <text x="92" y="178" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Fork + scaffold Plane's stack; register Pulse/Nexus identities</text>
+    <rect x="552" y="148" width="120" height="20" rx="10" fill="#0f172a" stroke="#64748b" stroke-width="1.5"/>
+    <text x="612" y="162" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#64748b">operator</text>
+    <text x="612" y="188" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">plane/ + Pulse + Nexus</text>
   </g>
 
   <!-- Stage 1: Ideate -->
   <g>
-    <rect x="40" y="200" width="640" height="58" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2"/>
-    <circle cx="64" cy="229" r="14" fill="#22d3ee"/>
-    <text x="64" y="234" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="14" font-weight="700" fill="#0f172a">1</text>
-    <text x="92" y="222" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Ideate</text>
-    <text x="92" y="240" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Ambiguity-killer Q&amp;A: sync/async threshold, CSV columns, URL expiry</text>
-    <rect x="552" y="209" width="120" height="20" rx="10" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
-    <text x="612" y="223" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#22d3ee">spec-agent</text>
-    <text x="612" y="246" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
+    <rect x="40" y="216" width="640" height="54" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2"/>
+    <circle cx="64" cy="243" r="13" fill="#22d3ee"/>
+    <text x="64" y="248" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">1</text>
+    <text x="92" y="237" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Ideate</text>
+    <text x="92" y="254" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Ambiguity-killer Q&amp;A: sync/async threshold, CSV columns, URL expiry</text>
+    <rect x="552" y="224" width="120" height="20" rx="10" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
+    <text x="612" y="238" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#22d3ee">spec-agent</text>
+    <text x="612" y="264" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
   </g>
 
   <!-- Stage 2: Refine -->
   <g>
-    <rect x="40" y="268" width="640" height="58" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2"/>
-    <circle cx="64" cy="297" r="14" fill="#22d3ee"/>
-    <text x="64" y="302" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="14" font-weight="700" fill="#0f172a">2</text>
-    <text x="92" y="290" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Refine</text>
-    <text x="92" y="308" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Codebase investigation supersedes 3 ideation assumptions</text>
-    <rect x="552" y="277" width="120" height="20" rx="10" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
-    <text x="612" y="291" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#22d3ee">spec-agent</text>
-    <text x="612" y="314" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
+    <rect x="40" y="292" width="640" height="54" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2"/>
+    <circle cx="64" cy="319" r="13" fill="#22d3ee"/>
+    <text x="64" y="324" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">2</text>
+    <text x="92" y="313" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Refine</text>
+    <text x="92" y="330" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Codebase investigation supersedes 3 ideation assumptions</text>
+    <rect x="552" y="300" width="120" height="20" rx="10" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
+    <text x="612" y="314" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#22d3ee">spec-agent</text>
+    <text x="612" y="340" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
   </g>
 
   <!-- Stage 3: Spec -->
   <g>
-    <rect x="40" y="336" width="640" height="58" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2"/>
-    <circle cx="64" cy="365" r="14" fill="#22d3ee"/>
-    <text x="64" y="370" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="14" font-weight="700" fill="#0f172a">3</text>
-    <text x="92" y="358" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Spec</text>
-    <text x="92" y="376" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">8 FRs, 5 TRs, 6 ACs, 1 API contract — validated 85/86/84/85/18</text>
-    <rect x="552" y="345" width="120" height="20" rx="10" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
-    <text x="612" y="359" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#22d3ee">spec-agent</text>
-    <text x="612" y="382" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
+    <rect x="40" y="368" width="640" height="54" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2"/>
+    <circle cx="64" cy="395" r="13" fill="#22d3ee"/>
+    <text x="64" y="400" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">3</text>
+    <text x="92" y="389" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Spec</text>
+    <text x="92" y="406" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">8 FRs, 5 TRs, 6 ACs, 1 API contract — validated 85/86/84/85/18</text>
+    <rect x="552" y="376" width="120" height="20" rx="10" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
+    <text x="612" y="390" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#22d3ee">spec-agent</text>
+    <text x="612" y="416" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
   </g>
 
   <!-- Stage 4: Sprint -->
   <g>
-    <rect x="40" y="404" width="640" height="58" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2"/>
-    <circle cx="64" cy="433" r="14" fill="#22d3ee"/>
-    <text x="64" y="438" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="14" font-weight="700" fill="#0f172a">4</text>
-    <text x="92" y="426" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Sprint</text>
-    <text x="92" y="444" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">4 cards created, dependency-linked, sprint made active</text>
-    <rect x="552" y="413" width="120" height="20" rx="10" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
-    <text x="612" y="427" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#22d3ee">spec-agent</text>
-    <text x="612" y="450" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
+    <rect x="40" y="444" width="640" height="54" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2"/>
+    <circle cx="64" cy="471" r="13" fill="#22d3ee"/>
+    <text x="64" y="476" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">4</text>
+    <text x="92" y="465" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Sprint</text>
+    <text x="92" y="482" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">4 cards created, dependency-linked, sprint made active</text>
+    <rect x="552" y="452" width="120" height="20" rx="10" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
+    <text x="612" y="466" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#22d3ee">spec-agent</text>
+    <text x="612" y="492" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
   </g>
 
   <!-- Stage 5: Backend implementation -->
   <g>
-    <rect x="40" y="472" width="640" height="58" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="2"/>
-    <circle cx="64" cy="501" r="14" fill="#fb923c"/>
-    <text x="64" y="506" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="14" font-weight="700" fill="#0f172a">5</text>
-    <text x="92" y="494" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Backend implementation</text>
-    <text x="92" y="512" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Export endpoint + Celery task extension, 17/17 tests, card → done</text>
-    <rect x="552" y="481" width="120" height="20" rx="10" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
-    <text x="612" y="495" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#fb923c">backend-agent</text>
-    <text x="612" y="518" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">plane/</text>
+    <rect x="40" y="520" width="640" height="54" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="2"/>
+    <circle cx="64" cy="547" r="13" fill="#fb923c"/>
+    <text x="64" y="552" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">5</text>
+    <text x="92" y="541" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Backend implementation</text>
+    <text x="92" y="558" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Export endpoint + Celery task extension, 17/17 tests, card → done</text>
+    <rect x="552" y="528" width="120" height="20" rx="10" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
+    <text x="612" y="542" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#fb923c">backend-agent</text>
+    <text x="612" y="568" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">plane/</text>
   </g>
 
   <!-- Stage 6: Handoff -->
   <g>
-    <rect x="40" y="540" width="640" height="58" rx="8" fill="#0f172a" stroke="#a855f7" stroke-width="2"/>
-    <circle cx="64" cy="569" r="14" fill="#a855f7"/>
-    <text x="64" y="574" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="14" font-weight="700" fill="#0f172a">6</text>
-    <text x="92" y="562" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Handoff</text>
-    <text x="92" y="580" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">handoff_create &#8594; claim &#8594; complete, API contract as artifact</text>
-    <rect x="552" y="549" width="120" height="20" rx="10" fill="#0f172a" stroke="#a855f7" stroke-width="1.5"/>
-    <text x="612" y="563" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#a855f7">Nexus</text>
-    <text x="612" y="586" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8.5" fill="#64748b">backend&#8594;frontend</text>
+    <rect x="40" y="596" width="640" height="54" rx="8" fill="#0f172a" stroke="#a855f7" stroke-width="2"/>
+    <circle cx="64" cy="623" r="13" fill="#a855f7"/>
+    <text x="64" y="628" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">6</text>
+    <text x="92" y="617" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Handoff</text>
+    <text x="92" y="634" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">handoff_create &#8594; claim &#8594; complete, API contract as artifact</text>
+    <rect x="552" y="604" width="120" height="20" rx="10" fill="#0f172a" stroke="#a855f7" stroke-width="1.5"/>
+    <text x="612" y="618" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#a855f7">Nexus</text>
+    <text x="612" y="644" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8.5" fill="#64748b">backend&#8594;frontend</text>
   </g>
 
   <!-- Stage 7: Frontend implementation -->
   <g>
-    <rect x="40" y="608" width="640" height="58" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="2"/>
-    <circle cx="64" cy="637" r="14" fill="#34d399"/>
-    <text x="64" y="642" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="14" font-weight="700" fill="#0f172a">7</text>
-    <text x="92" y="630" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Frontend implementation</text>
-    <text x="92" y="648" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Toolbar action against delivered contract, clean typecheck</text>
-    <rect x="552" y="617" width="120" height="20" rx="10" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
-    <text x="612" y="631" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#34d399">frontend-agent</text>
-    <text x="612" y="654" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">plane/</text>
+    <rect x="40" y="672" width="640" height="54" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="2"/>
+    <circle cx="64" cy="699" r="13" fill="#34d399"/>
+    <text x="64" y="704" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">7</text>
+    <text x="92" y="693" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Frontend implementation</text>
+    <text x="92" y="710" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Toolbar action against delivered contract, clean typecheck</text>
+    <rect x="552" y="680" width="120" height="20" rx="10" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+    <text x="612" y="694" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#34d399">frontend-agent</text>
+    <text x="612" y="720" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">plane/</text>
   </g>
 
   <!-- Stage 8: Task validation gate -->
   <g>
-    <rect x="40" y="676" width="640" height="58" rx="8" fill="#0f172a" stroke="#f472b6" stroke-width="2"/>
-    <circle cx="64" cy="705" r="14" fill="#f472b6"/>
-    <text x="64" y="710" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="14" font-weight="700" fill="#0f172a">8</text>
-    <text x="92" y="698" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Task validation gate</text>
-    <text x="92" y="716" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">completeness=78 rejected at board threshold 80</text>
-    <rect x="552" y="685" width="120" height="20" rx="10" fill="#0f172a" stroke="#f472b6" stroke-width="1.5"/>
-    <text x="612" y="699" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#f472b6">validator-agent</text>
-    <text x="612" y="722" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
+    <rect x="40" y="748" width="640" height="54" rx="8" fill="#0f172a" stroke="#f472b6" stroke-width="2"/>
+    <circle cx="64" cy="775" r="13" fill="#f472b6"/>
+    <text x="64" y="780" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">8</text>
+    <text x="92" y="769" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Task validation gate</text>
+    <text x="92" y="786" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">completeness=78 rejected at board threshold 80</text>
+    <rect x="552" y="756" width="120" height="20" rx="10" fill="#0f172a" stroke="#f472b6" stroke-width="1.5"/>
+    <text x="612" y="770" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#f472b6">validator-agent</text>
+    <text x="612" y="796" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
   </g>
 
   <!-- Stage 9: Extending test coverage -->
   <g>
-    <rect x="40" y="744" width="640" height="58" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="2"/>
-    <circle cx="64" cy="773" r="14" fill="#34d399"/>
-    <text x="64" y="778" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="14" font-weight="700" fill="#0f172a">9</text>
-    <text x="92" y="766" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Extending test coverage</text>
-    <text x="92" y="784" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Playwright e2e added, pipeline verified live, real regression fixed</text>
-    <rect x="552" y="753" width="120" height="20" rx="10" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
-    <text x="612" y="767" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#34d399">frontend-agent</text>
-    <text x="612" y="790" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">plane/</text>
+    <rect x="40" y="824" width="640" height="54" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="2"/>
+    <circle cx="64" cy="851" r="13" fill="#34d399"/>
+    <text x="64" y="856" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">9</text>
+    <text x="92" y="845" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Extending test coverage</text>
+    <text x="92" y="862" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Playwright e2e added, pipeline verified live, real regression fixed</text>
+    <rect x="552" y="832" width="120" height="20" rx="10" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+    <text x="612" y="846" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#34d399">frontend-agent</text>
+    <text x="612" y="872" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">plane/</text>
   </g>
 
   <!-- footer -->
-  <text x="360" y="826" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="12" fill="#94a3b8">Pulse governs stages 1–4 &amp; 8 · Nexus governs stage 6 · plane/ receives real code at 5, 7, 9</text>
-  <text x="360" y="846" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="12" fill="#94a3b8">One Claude Code session throughout; each agent name above is the MCP identity active for that stage</text>
+  <text x="360" y="904" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="12" fill="#94a3b8">Pulse governs stages 1–4 &amp; 8 · Nexus governs stage 6 · plane/ receives real code at 5, 7, 9</text>
+  <text x="360" y="924" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="12" fill="#94a3b8">One Claude Code session throughout; each agent name above is the MCP identity active for that stage</text>
 </svg>
