@@ -1,185 +1,158 @@
-<svg width="720" height="950" viewBox="0 0 720 950" xmlns="http://www.w3.org/2000/svg">
+<svg width="1200" height="780" viewBox="0 0 1200 780" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#1e293b"/>
-    </linearGradient>
-    <marker id="arrow-gray" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M0 0 L10 5 L0 10 z" fill="#475569"/>
-    </marker>
-    <marker id="arrow-orange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M0 0 L10 5 L0 10 z" fill="#fb923c"/>
-    </marker>
-    <marker id="arrow-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M0 0 L10 5 L0 10 z" fill="#a855f7"/>
+    <marker id="arrow-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#0d9488"/>
     </marker>
   </defs>
 
-  <rect width="720" height="950" fill="url(#bg)"/>
+  <rect width="1200" height="780" fill="#ffffff"/>
 
-  <!-- header -->
-  <text x="360" y="34" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="18" font-weight="700" fill="#f8fafc">One Claude Code session, four named agent identities</text>
-  <text x="360" y="54" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="12" fill="#94a3b8">each MCP call carries the identity for its stage — not a separate program per agent</text>
+  <!-- frame bars -->
+  <rect x="0" y="0" width="1200" height="8" fill="#111827"/>
+  <rect x="0" y="772" width="1200" height="8" fill="#111827"/>
 
-  <!-- legend chips -->
-  <g font-family="'SF Mono','Menlo',monospace" font-size="11" font-weight="600">
-    <rect x="38" y="76" width="155" height="26" rx="13" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
-    <text x="115" y="93" text-anchor="middle" fill="#22d3ee">spec-agent</text>
+  <!-- title -->
+  <text x="600" y="56" text-anchor="middle" font-family="-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="34" font-weight="700" fill="#111827">Conceptual Architecture</text>
 
-    <rect x="201" y="76" width="155" height="26" rx="13" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
-    <text x="278" y="93" text-anchor="middle" fill="#fb923c">backend-agent</text>
+  <!-- ============ LAYER BOXES ============ -->
+  <!-- Layer 1: Agent Layer -->
+  <rect x="40" y="110" width="350" height="610" fill="none" stroke="#111827" stroke-width="2.5"/>
+  <rect x="55" y="98" width="150" height="24" fill="#ffffff"/>
+  <text x="60" y="115" font-family="-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="16" font-weight="700" fill="#111827">Agent Layer</text>
 
-    <rect x="364" y="76" width="155" height="26" rx="13" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
-    <text x="441" y="93" text-anchor="middle" fill="#34d399">frontend-agent</text>
+  <!-- Layer 2: Coordination Layer -->
+  <rect x="425" y="110" width="350" height="610" fill="none" stroke="#111827" stroke-width="2.5"/>
+  <rect x="440" y="98" width="230" height="24" fill="#ffffff"/>
+  <text x="445" y="115" font-family="-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="16" font-weight="700" fill="#111827">Coordination Layer</text>
 
-    <rect x="527" y="76" width="155" height="26" rx="13" fill="#0f172a" stroke="#f472b6" stroke-width="1.5"/>
-    <text x="604" y="93" text-anchor="middle" fill="#f472b6">validator-agent</text>
+  <!-- Layer 3: Target Application Layer -->
+  <rect x="810" y="110" width="350" height="610" fill="none" stroke="#111827" stroke-width="2.5"/>
+  <rect x="825" y="98" width="270" height="24" fill="#ffffff"/>
+  <text x="830" y="115" font-family="-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="16" font-weight="700" fill="#111827">Target Application Layer</text>
+
+  <!-- ============ LAYER 1 CONTENT: 4-stage agent chain ============ -->
+  <rect x="100" y="150" width="230" height="530" fill="none" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="5,4" rx="6"/>
+
+  <!-- spec-agent: document icon -->
+  <g transform="translate(194,172)">
+    <path d="M0,0 H30 L42,12 V58 H0 Z" fill="#eef4fb" stroke="#2f6690" stroke-width="2"/>
+    <path d="M30,0 L30,12 L42,12" fill="none" stroke="#2f6690" stroke-width="2"/>
+    <line x1="8" y1="26" x2="34" y2="26" stroke="#2f6690" stroke-width="2"/>
+    <line x1="8" y1="36" x2="34" y2="36" stroke="#2f6690" stroke-width="2"/>
+    <line x1="8" y1="46" x2="24" y2="46" stroke="#2f6690" stroke-width="2"/>
   </g>
+  <text x="215" y="252" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#111827">spec-agent</text>
+  <text x="215" y="268" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="11" fill="#6b7280">ideation → refinement → spec</text>
+  <line x1="215" y1="280" x2="215" y2="310" stroke="#0d9488" stroke-width="2.5" marker-end="url(#arrow-teal)"/>
 
-  <line x1="40" y1="120" x2="680" y2="120" stroke="#334155" stroke-width="1"/>
-
-  <!-- pipeline arrows: stage N box-bottom -> stage N+1 box-top, left rail -->
-  <g stroke="#475569" stroke-width="2" fill="none" marker-end="url(#arrow-gray)">
-    <line x1="64" y1="197" x2="64" y2="213"/>
-    <line x1="64" y1="273" x2="64" y2="289"/>
-    <line x1="64" y1="349" x2="64" y2="365"/>
-    <line x1="64" y1="425" x2="64" y2="441"/>
-    <line x1="64" y1="501" x2="64" y2="517"/>
-    <line x1="64" y1="577" x2="64" y2="593"/>
-    <line x1="64" y1="653" x2="64" y2="669"/>
-    <line x1="64" y1="729" x2="64" y2="745"/>
-    <line x1="64" y1="805" x2="64" y2="821"/>
+  <!-- backend-agent: server icon -->
+  <g transform="translate(192,314)">
+    <rect x="0" y="0" width="46" height="52" rx="4" fill="#eef4fb" stroke="#2f6690" stroke-width="2"/>
+    <line x1="8" y1="13" x2="38" y2="13" stroke="#2f6690" stroke-width="2"/>
+    <line x1="8" y1="26" x2="38" y2="26" stroke="#2f6690" stroke-width="2"/>
+    <line x1="8" y1="39" x2="38" y2="39" stroke="#2f6690" stroke-width="2"/>
+    <circle cx="34" cy="13" r="1.6" fill="#0d9488"/>
+    <circle cx="34" cy="26" r="1.6" fill="#0d9488"/>
+    <circle cx="34" cy="39" r="1.6" fill="#0d9488"/>
   </g>
+  <text x="215" y="386" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#111827">backend-agent</text>
+  <text x="215" y="402" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="11" fill="#6b7280">implements against plane/</text>
+  <line x1="215" y1="414" x2="215" y2="444" stroke="#0d9488" stroke-width="2.5" marker-end="url(#arrow-teal)"/>
 
-  <!-- identity handoff arrows: backend-agent chip -> Nexus chip -> frontend-agent chip, right rail -->
-  <g stroke-width="2" fill="none">
-    <line x1="612" y1="551" x2="612" y2="592" stroke="#fb923c" marker-end="url(#arrow-orange)"/>
-    <line x1="612" y1="627" x2="612" y2="668" stroke="#a855f7" marker-end="url(#arrow-purple)"/>
+  <!-- frontend-agent: monitor icon -->
+  <g transform="translate(188,448)">
+    <rect x="0" y="0" width="54" height="36" rx="3" fill="#eef4fb" stroke="#2f6690" stroke-width="2"/>
+    <line x1="27" y1="36" x2="27" y2="46" stroke="#2f6690" stroke-width="2"/>
+    <line x1="15" y1="46" x2="39" y2="46" stroke="#2f6690" stroke-width="2"/>
+    <path d="M10,10 h6 M10,10 v6 M44,10 h-6 M44,10 v6 M10,26 h6 M10,26 v-6 M44,26 h-6 M44,26 v-6" stroke="#0d9488" stroke-width="2" fill="none"/>
   </g>
-  <text x="632" y="574" font-family="-apple-system,sans-serif" font-size="8.5" fill="#fb923c">hands off</text>
-  <text x="632" y="650" font-family="-apple-system,sans-serif" font-size="8.5" fill="#a855f7">delivers to</text>
+  <text x="215" y="518" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#111827">frontend-agent</text>
+  <text x="215" y="534" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="11" fill="#6b7280">Issues List UI + Playwright</text>
+  <line x1="215" y1="546" x2="215" y2="576" stroke="#0d9488" stroke-width="2.5" marker-end="url(#arrow-teal)"/>
 
-  <!-- Stage 0: Setup -->
-  <g>
-    <rect x="40" y="140" width="640" height="54" rx="8" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
-    <circle cx="64" cy="167" r="13" fill="#64748b"/>
-    <text x="64" y="172" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">0</text>
-    <text x="92" y="161" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Setup</text>
-    <text x="92" y="178" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Fork + scaffold Plane's stack; register Pulse/Nexus identities</text>
-    <rect x="552" y="148" width="120" height="20" rx="10" fill="#0f172a" stroke="#64748b" stroke-width="1.5"/>
-    <text x="612" y="162" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#64748b">operator</text>
-    <text x="612" y="188" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">plane/ + Pulse + Nexus</text>
+  <!-- validator-agent: shield icon -->
+  <g transform="translate(200,580)">
+    <path d="M15,0 L30,6 V20 C30,32 15,38 15,38 C15,38 0,32 0,20 V6 Z" fill="#eef4fb" stroke="#2f6690" stroke-width="2"/>
+    <path d="M6,19 L12,25 L24,11" fill="none" stroke="#0d9488" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
+  <text x="215" y="636" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#111827">validator-agent</text>
+  <text x="215" y="652" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="11" fill="#6b7280">task-validation gate</text>
 
-  <!-- Stage 1: Ideate -->
-  <g>
-    <rect x="40" y="216" width="640" height="54" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2"/>
-    <circle cx="64" cy="243" r="13" fill="#22d3ee"/>
-    <text x="64" y="248" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">1</text>
-    <text x="92" y="237" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Ideate</text>
-    <text x="92" y="254" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Ambiguity-killer Q&amp;A: sync/async threshold, CSV columns, URL expiry</text>
-    <rect x="552" y="224" width="120" height="20" rx="10" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
-    <text x="612" y="238" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#22d3ee">spec-agent</text>
-    <text x="612" y="264" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
+  <!-- MCP pill, outside dotted box -->
+  <rect x="150" y="672" width="130" height="30" rx="15" fill="#ffffff" stroke="#111827" stroke-width="1.5"/>
+  <text x="215" y="692" text-anchor="middle" font-family="'SF Mono','Menlo',monospace" font-size="12" font-weight="600" fill="#111827">MCP session</text>
+
+  <!-- arrow layer1 -> layer2 -->
+  <line x1="390" y1="390" x2="418" y2="390" stroke="#0d9488" stroke-width="2.5" marker-end="url(#arrow-teal)"/>
+
+  <!-- ============ LAYER 2 CONTENT: Pulse + Nexus pipeline ============ -->
+  <!-- Pulse KG cylinder -->
+  <g transform="translate(555,160)">
+    <path d="M0,10 C0,4 20,0 45,0 C70,0 90,4 90,10 V54 C90,60 70,64 45,64 C20,64 0,60 0,54 Z" fill="#dbeafe" stroke="#2f6690" stroke-width="2"/>
+    <path d="M0,10 C0,16 20,20 45,20 C70,20 90,16 90,10" fill="none" stroke="#2f6690" stroke-width="2"/>
   </g>
+  <text x="600" y="246" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="12" font-weight="700" fill="#111827">Pulse Knowledge Graph</text>
+  <text x="600" y="262" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="11" fill="#6b7280">boards · specs · decisions</text>
+  <line x1="600" y1="274" x2="600" y2="304" stroke="#0d9488" stroke-width="2.5" marker-end="url(#arrow-teal)"/>
 
-  <!-- Stage 2: Refine -->
-  <g>
-    <rect x="40" y="292" width="640" height="54" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2"/>
-    <circle cx="64" cy="319" r="13" fill="#22d3ee"/>
-    <text x="64" y="324" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">2</text>
-    <text x="92" y="313" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Refine</text>
-    <text x="92" y="330" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Codebase investigation supersedes 3 ideation assumptions</text>
-    <rect x="552" y="300" width="120" height="20" rx="10" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
-    <text x="612" y="314" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#22d3ee">spec-agent</text>
-    <text x="612" y="340" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
+  <!-- Spec / Sprint documents -->
+  <g transform="translate(578,308)">
+    <path d="M0,0 H26 L36,10 V50 H0 Z" fill="#eef4fb" stroke="#2f6690" stroke-width="2"/>
+    <path d="M26,0 L26,10 L36,10" fill="none" stroke="#2f6690" stroke-width="2"/>
+    <line x1="7" y1="24" x2="30" y2="24" stroke="#2f6690" stroke-width="1.8"/>
+    <line x1="7" y1="34" x2="30" y2="34" stroke="#2f6690" stroke-width="1.8"/>
   </g>
+  <text x="600" y="378" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="12" fill="#111827">Spec / Sprint / Cards</text>
+  <line x1="600" y1="390" x2="600" y2="420" stroke="#0d9488" stroke-width="2.5" marker-end="url(#arrow-teal)"/>
 
-  <!-- Stage 3: Spec -->
-  <g>
-    <rect x="40" y="368" width="640" height="54" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2"/>
-    <circle cx="64" cy="395" r="13" fill="#22d3ee"/>
-    <text x="64" y="400" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">3</text>
-    <text x="92" y="389" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Spec</text>
-    <text x="92" y="406" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">8 FRs, 5 TRs, 6 ACs, 1 API contract — validated 85/86/84/85/18</text>
-    <rect x="552" y="376" width="120" height="20" rx="10" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
-    <text x="612" y="390" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#22d3ee">spec-agent</text>
-    <text x="612" y="416" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
+  <!-- Nexus Handoff Log box -->
+  <rect x="530" y="424" width="140" height="56" fill="#ffffff" stroke="#111827" stroke-width="2"/>
+  <text x="600" y="448" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="12" font-weight="700" fill="#111827">Nexus Handoff Log</text>
+  <text x="600" y="464" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10" fill="#6b7280">create · claim · complete</text>
+  <line x1="600" y1="480" x2="600" y2="510" stroke="#0d9488" stroke-width="2.5" marker-end="url(#arrow-teal)"/>
+
+  <!-- Task Validation Gate box -->
+  <rect x="510" y="514" width="180" height="56" rx="8" fill="#ffffff" stroke="#111827" stroke-width="2"/>
+  <text x="600" y="538" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="12" font-weight="700" fill="#111827">Task Validation Gate</text>
+  <text x="600" y="554" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10" fill="#6b7280">enforces threshold before done</text>
+
+  <!-- arrow layer2 -> layer3 -->
+  <line x1="775" y1="390" x2="803" y2="390" stroke="#0d9488" stroke-width="2.5" marker-end="url(#arrow-teal)"/>
+
+  <!-- ============ LAYER 3 CONTENT ============ -->
+  <!-- API document icon -->
+  <g transform="translate(965,172)">
+    <path d="M0,0 H30 L42,12 V58 H0 Z" fill="#eef4fb" stroke="#2f6690" stroke-width="2"/>
+    <path d="M30,0 L30,12 L42,12" fill="none" stroke="#2f6690" stroke-width="2"/>
+    <line x1="8" y1="26" x2="34" y2="26" stroke="#2f6690" stroke-width="2"/>
+    <line x1="8" y1="36" x2="34" y2="36" stroke="#2f6690" stroke-width="2"/>
+    <line x1="8" y1="46" x2="24" y2="46" stroke="#2f6690" stroke-width="2"/>
   </g>
+  <text x="985" y="252" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#111827">Django REST API</text>
+  <text x="985" y="268" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="11" fill="#6b7280">CSV export pipeline</text>
+  <line x1="985" y1="280" x2="985" y2="310" stroke="#0d9488" stroke-width="2.5" marker-end="url(#arrow-teal)"/>
 
-  <!-- Stage 4: Sprint -->
-  <g>
-    <rect x="40" y="444" width="640" height="54" rx="8" fill="#0f172a" stroke="#22d3ee" stroke-width="2"/>
-    <circle cx="64" cy="471" r="13" fill="#22d3ee"/>
-    <text x="64" y="476" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">4</text>
-    <text x="92" y="465" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Sprint</text>
-    <text x="92" y="482" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">4 cards created, dependency-linked, sprint made active</text>
-    <rect x="552" y="452" width="120" height="20" rx="10" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
-    <text x="612" y="466" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#22d3ee">spec-agent</text>
-    <text x="612" y="492" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
+  <!-- Web app monitor icon -->
+  <g transform="translate(950,314)">
+    <rect x="0" y="0" width="70" height="46" rx="3" fill="#eef4fb" stroke="#2f6690" stroke-width="2"/>
+    <line x1="35" y1="46" x2="35" y2="58" stroke="#2f6690" stroke-width="2"/>
+    <line x1="18" y1="58" x2="52" y2="58" stroke="#2f6690" stroke-width="2"/>
+    <path d="M12,12 h8 M12,12 v8 M58,12 h-8 M58,12 v8 M12,34 h8 M12,34 v-8 M58,34 h-8 M58,34 v-8" stroke="#0d9488" stroke-width="2.2" fill="none"/>
   </g>
+  <text x="985" y="394" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#111827">React / Vite Web</text>
+  <text x="985" y="410" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="11" fill="#6b7280">Issues List, filter-aware export</text>
 
-  <!-- Stage 5: Backend implementation -->
-  <g>
-    <rect x="40" y="520" width="640" height="54" rx="8" fill="#0f172a" stroke="#fb923c" stroke-width="2"/>
-    <circle cx="64" cy="547" r="13" fill="#fb923c"/>
-    <text x="64" y="552" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">5</text>
-    <text x="92" y="541" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Backend implementation</text>
-    <text x="92" y="558" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Export endpoint + Celery task extension, 17/17 tests, card → done</text>
-    <rect x="552" y="528" width="120" height="20" rx="10" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
-    <text x="612" y="542" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#fb923c">backend-agent</text>
-    <text x="612" y="568" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">plane/</text>
+  <line x1="985" y1="420" x2="985" y2="450" stroke="#0d9488" stroke-width="2.5" marker-end="url(#arrow-teal)"/>
+
+  <!-- Playwright tests document icon -->
+  <g transform="translate(965,454)">
+    <path d="M0,0 H30 L42,12 V58 H0 Z" fill="#eef4fb" stroke="#2f6690" stroke-width="2"/>
+    <path d="M30,0 L30,12 L42,12" fill="none" stroke="#2f6690" stroke-width="2"/>
+    <path d="M10,24 L18,32 L32,16" fill="none" stroke="#0d9488" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
+  <text x="985" y="534" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#111827">Playwright Suite</text>
+  <text x="985" y="550" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="11" fill="#6b7280">end-to-end vs docker-compose</text>
 
-  <!-- Stage 6: Handoff -->
-  <g>
-    <rect x="40" y="596" width="640" height="54" rx="8" fill="#0f172a" stroke="#a855f7" stroke-width="2"/>
-    <circle cx="64" cy="623" r="13" fill="#a855f7"/>
-    <text x="64" y="628" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">6</text>
-    <text x="92" y="617" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Handoff</text>
-    <text x="92" y="634" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">handoff_create &#8594; claim &#8594; complete, API contract as artifact</text>
-    <rect x="552" y="604" width="120" height="20" rx="10" fill="#0f172a" stroke="#a855f7" stroke-width="1.5"/>
-    <text x="612" y="618" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#a855f7">Nexus</text>
-    <text x="612" y="644" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8.5" fill="#64748b">backend&#8594;frontend</text>
-  </g>
-
-  <!-- Stage 7: Frontend implementation -->
-  <g>
-    <rect x="40" y="672" width="640" height="54" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="2"/>
-    <circle cx="64" cy="699" r="13" fill="#34d399"/>
-    <text x="64" y="704" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">7</text>
-    <text x="92" y="693" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Frontend implementation</text>
-    <text x="92" y="710" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Toolbar action against delivered contract, clean typecheck</text>
-    <rect x="552" y="680" width="120" height="20" rx="10" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
-    <text x="612" y="694" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#34d399">frontend-agent</text>
-    <text x="612" y="720" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">plane/</text>
-  </g>
-
-  <!-- Stage 8: Task validation gate -->
-  <g>
-    <rect x="40" y="748" width="640" height="54" rx="8" fill="#0f172a" stroke="#f472b6" stroke-width="2"/>
-    <circle cx="64" cy="775" r="13" fill="#f472b6"/>
-    <text x="64" y="780" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">8</text>
-    <text x="92" y="769" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Task validation gate</text>
-    <text x="92" y="786" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">completeness=78 rejected at board threshold 80</text>
-    <rect x="552" y="756" width="120" height="20" rx="10" fill="#0f172a" stroke="#f472b6" stroke-width="1.5"/>
-    <text x="612" y="770" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#f472b6">validator-agent</text>
-    <text x="612" y="796" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">Pulse</text>
-  </g>
-
-  <!-- Stage 9: Extending test coverage -->
-  <g>
-    <rect x="40" y="824" width="640" height="54" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="2"/>
-    <circle cx="64" cy="851" r="13" fill="#34d399"/>
-    <text x="64" y="856" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#0f172a">9</text>
-    <text x="92" y="845" font-family="-apple-system,'Segoe UI',sans-serif" font-size="13" font-weight="700" fill="#f8fafc">Extending test coverage</text>
-    <text x="92" y="862" font-family="-apple-system,'Segoe UI',sans-serif" font-size="10.5" fill="#94a3b8">Playwright e2e added, pipeline verified live, real regression fixed</text>
-    <rect x="552" y="832" width="120" height="20" rx="10" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
-    <text x="612" y="846" text-anchor="middle" font-family="'SF Mono',monospace" font-size="10" fill="#34d399">frontend-agent</text>
-    <text x="612" y="872" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="9" fill="#64748b">plane/</text>
-  </g>
-
-  <!-- footer -->
-  <text x="360" y="904" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="12" fill="#94a3b8">Pulse governs stages 1–4 &amp; 8 · Nexus governs stage 6 · plane/ receives real code at 5, 7, 9</text>
-  <text x="360" y="924" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="12" fill="#94a3b8">One Claude Code session throughout; each agent name above is the MCP identity active for that stage</text>
+  <!-- footer caption -->
+  <text x="600" y="750" text-anchor="middle" font-family="-apple-system,'Segoe UI',sans-serif" font-size="12" fill="#6b7280">Pulse governs what to build · Nexus governs who acts and when · both target the same plane/ checkout</text>
 </svg>

@@ -164,10 +164,10 @@ The real state behind this run is in [`demo-state/`](demo-state/): see [`demo-st
 ## Architecture
 
 <div align="center">
-  <img src="docs/images/architecture-diagram.svg" alt="One Claude Code session running as four named agent identities across the run's 10 stages: spec-agent on Pulse for ideation through sprint, backend-agent implementing against plane/, a Nexus handoff from backend-agent to frontend-agent, frontend-agent implementing and testing against plane/, and validator-agent enforcing Pulse's task-validation gate" width="520">
+  <img src="docs/images/architecture-diagram.svg" alt="Three-layer architecture: an Agent Layer of four role-based identities (spec-agent, backend-agent, frontend-agent, validator-agent) driving a Coordination Layer where Pulse governs what to build and Nexus governs who acts and when, both targeting a Target Application Layer of the plane/ fork's Django API and React web app" width="640">
 </div>
 
-Pulse and Nexus share no code, config, or service; the only connection is this one agent client holding both MCP server URLs simultaneously, working against the same `plane/` checkout. See [`docs/architecture.md`](docs/architecture.md) for the full breakdown, including the exact integration points inside Plane's own code.
+Pulse and Nexus share no code, config, or service; the only connection is an agent client holding both MCP server URLs simultaneously, working against the same `plane/` checkout. The four roles are identity-based, not program-based — `spec-agent`, `backend-agent`, `frontend-agent`, and `validator-agent` are independent MCP identities, each free to be driven by its own agent or model. See [`docs/architecture.md`](docs/architecture.md) for the full breakdown, including the exact integration points inside Plane's own code.
 
 <br/>
 
@@ -189,12 +189,15 @@ Pulse and Nexus share no code, config, or service; the only connection is this o
 
 ## Roles
 
-One Claude Code session ran this whole demo — there's no separate program per
-agent. What makes it four agents rather than one is the identity: each stage's
-MCP calls went out under that stage's own registered Pulse preset / Nexus
-agent key, so the board and the handoff log record four distinct actors, not
-one. The naming convention is function-first (`<role>-agent`), matching what
-each identity actually did:
+There's no single program behind these four agents — each is its own MCP
+identity. What makes it four agents rather than one is the identity: each
+stage's MCP calls went out under that stage's own registered Pulse preset /
+Nexus agent key, so the board and the handoff log record four distinct
+actors, not one. Because the roles are identity-based rather than
+program-based, each one can be driven independently — by a single agent
+client across all four, or by a different model per identity. The naming
+convention is function-first (`<role>-agent`), matching what each identity
+actually did:
 
 | Role | Pulse preset | Nexus identity | Did |
 | :--- | :--- | :--- | :--- |

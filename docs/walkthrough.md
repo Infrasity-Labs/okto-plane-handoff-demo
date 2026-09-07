@@ -112,7 +112,7 @@ existing regression coverage re-run for confidence. `okto_pulse_move_card
 
 ## 6. Nexus handoff
 
-This Claude Code session's MCP client needed a full session reconnect
+This run's MCP client needed a full session reconnect
 cycle before it reliably picked up a changed identity on the Nexus
 connection. The practical path: `curl -L "http://127.0.0.1:8202/mcp?api_key=<key>"
 -X POST` with the exact JSON-RPC `tools/call` body, to act under the
