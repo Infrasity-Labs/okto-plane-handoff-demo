@@ -4,9 +4,10 @@
 
 Pulse and Nexus remain architecturally independent (no import, network call,
 or config flag connects their codebases) — the only connection is a single
-agent client (here: one Claude Code session, playing both `backend-agent`
-and `frontend-agent`) holding both MCP server URLs simultaneously, working
-against the same `plane/` checkout.
+agent client (here: one Claude Code session, playing all four registered
+identities — `spec-agent`, `backend-agent`, `frontend-agent`,
+`validator-agent` — one per stage) holding both MCP server URLs
+simultaneously, working against the same `plane/` checkout.
 
 - **Pulse** governs *what to build*: ideation → refinement → spec → sprint →
   card lifecycle, knowledge graph, spec-gated validation.
@@ -43,12 +44,16 @@ Sprint (4 cards, dependency-linked)
 
 ## Agent roles
 
-| Role | Preset (Pulse) | Nexus identity | Client | Actually used as |
-|---|---|---|---|---|
-| Spec Agent | Spec | `spec-agent` | — | not separately exercised — same session did ideation/refinement/spec |
-| Backend Agent | Executor | `backend-agent` | Claude Code | ran under a fallback local identity due to an MCP client reconnection quirk (disclosed in the event log) |
-| Frontend Agent | Executor | `frontend-agent` | Claude Code (standing in for Cursor) | ran as the real `frontend-agent` identity via a direct MCP call |
-| Validator Agent | Validator | `validator-agent` | — | task validations submitted under the same session identity, `reviewer_separation_mode=off` on this board |
+All four rows below ran in the same Claude Code session; the naming
+convention (`<role>-agent`) tracks the MCP identity active for each stage,
+not a separate program or client.
+
+| Role | Preset (Pulse) | Nexus identity | Actually used as |
+|---|---|---|---|
+| Spec Agent | Spec | `spec-agent` | not separately exercised on Nexus — same session did ideation/refinement/spec on Pulse |
+| Backend Agent | Executor | `backend-agent` | ran under a fallback local identity due to an MCP client reconnection quirk (disclosed in the event log) |
+| Frontend Agent | Executor | `frontend-agent` | ran as the real `frontend-agent` identity via a direct MCP call |
+| Validator Agent | Validator | `validator-agent` | task validations submitted under the same session identity, `reviewer_separation_mode=off` on this board |
 
 ## Integration points inside Plane
 

@@ -164,7 +164,7 @@ The real state behind this run is in [`demo-state/`](demo-state/): see [`demo-st
 ## Architecture
 
 <div align="center">
-  <img src="docs/images/architecture-diagram.svg" alt="Agent Client connects to Okto Pulse and Okto Nexus over MCP; Pulse owns ideation through task validation, Nexus owns the handoff create/claim/complete trail, both against the same plane/ fork checkout" width="640">
+  <img src="docs/images/architecture-diagram.svg" alt="One Claude Code session running as four named agent identities across the run's 10 stages: spec-agent on Pulse for ideation through sprint, backend-agent implementing against plane/, a Nexus handoff from backend-agent to frontend-agent, frontend-agent implementing and testing against plane/, and validator-agent enforcing Pulse's task-validation gate" width="520">
 </div>
 
 Pulse and Nexus share no code, config, or service; the only connection is this one agent client holding both MCP server URLs simultaneously, working against the same `plane/` checkout. See [`docs/architecture.md`](docs/architecture.md) for the full breakdown, including the exact integration points inside Plane's own code.
@@ -189,12 +189,22 @@ Pulse and Nexus share no code, config, or service; the only connection is this o
 
 ## Roles
 
-| Role | Pulse preset | Nexus identity | Client | Did |
-| :--- | :--- | :--- | :--- | :--- |
-| Spec Agent | Spec | `spec-agent` | Claude Code | Ideation, refinement, spec authoring and validation |
-| Backend Agent | Executor | `backend-agent` | Claude Code | Implemented the export endpoint + Celery task extension, ran real tests inside the project's own docker-compose stack |
-| Frontend Agent | Executor | `frontend-agent` | Claude Code (standing in for Cursor) | Claimed the real Nexus handoff, implemented the toolbar action against the delivered contract |
-| Validator Agent | Validator | `validator-agent` | Claude Code | Submitted task validations against Pulse's deterministic thresholds |
+One Claude Code session ran this whole demo — there's no separate program per
+agent. What makes it four agents rather than one is the identity: each stage's
+MCP calls went out under that stage's own registered Pulse preset / Nexus
+agent key, so the board and the handoff log record four distinct actors, not
+one. The naming convention is function-first (`<role>-agent`), matching what
+each identity actually did:
+
+| Role | Pulse preset | Nexus identity | Did |
+| :--- | :--- | :--- | :--- |
+| Spec Agent | Spec | `spec-agent` | Ideation, refinement, spec authoring and validation |
+| Backend Agent | Executor | `backend-agent` | Implemented the export endpoint + Celery task extension, ran real tests inside the project's own docker-compose stack |
+| Frontend Agent | Executor | `frontend-agent` | Claimed the real Nexus handoff, implemented the toolbar action against the delivered contract |
+| Validator Agent | Validator | `validator-agent` | Submitted task validations against Pulse's deterministic thresholds |
+
+See [Architecture](#architecture) for exactly which agent identity acted at
+each of the run's 10 stages.
 
 <br/>
 
