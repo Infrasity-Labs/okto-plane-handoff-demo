@@ -106,8 +106,7 @@ docker compose run --rm --no-deps -e DJANGO_SETTINGS_MODULE=plane.settings.test 
 ```
 
 (`pytest.ini` isn't copied into the image — pass `DJANGO_SETTINGS_MODULE`
-and `--reuse-db --nomigrations` explicitly.) 17/17 passed, including
-existing regression coverage re-run for confidence. `okto_pulse_move_card
+and `--reuse-db --nomigrations` explicitly.) 7/7 passed across contract and unit test functions in the suite. `okto_pulse_move_card
 (status="validation")` → `okto_pulse_submit_task_validation` → `done`.
 
 ## 6. Nexus handoff

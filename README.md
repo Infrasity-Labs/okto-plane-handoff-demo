@@ -104,9 +104,9 @@ The feature: wire Plane's Issues List view to its own existing async CSV export 
 
 1. **Ideate, ambiguity-killed.** Three open questions (sync/async threshold, CSV columns, signed-URL expiry) resolved via Q&A before `problem_statement` is written.
 2. **Refine against real code.** A subagent reads the actual forked `plane/` source and finds a complete, unused async export pipeline already exists: three of the ideation's assumptions get superseded on the spot.
-3. **Spec, validated.** 8 functional requirements, 5 technical requirements, 6 acceptance criteria, 6 business rules, 1 API contract: every one traced to a real card, passing Pulse's five-dimension gate at 85/86/84/85/18.
+3. **Spec, validated.** 19 evaluated requirements (8 functional + 5 technical + 6 acceptance criteria), 6 business rules, 1 API contract: every one traced to a real card, passing Pulse's five-dimension gate across Completeness (85 ≥ 70), Granularity (86 ≥ 80), Coherence (84 ≥ 80), Test Quality (85 ≥ 80), and Ambiguity (18 ≤ 30, lower is better).
 4. **Sprint, 4 cards.** Backend, Frontend, and their two dependent test cards, assigned and made active.
-5. **Backend implementation.** Real code, real pytest run (17/17), card reaches `done`.
+5. **Backend implementation.** Real code, real pytest run (7/7 in test_export_issues_rich_filters_app.py), card reaches `done`.
 6. **Nexus handoff.** `handoff_create` (API contract as payload) → `handoff_claim` → `handoff_complete`, with a real contract refinement reported back through the completion payload.
 7. **Frontend implementation.** Real code against the delivered contract, verified by a clean workspace typecheck.
 8. **Task validation gate enforces its threshold.** Submitted at an honest `completeness=78`: the gate rejects it regardless of the reviewer's own "approve" recommendation, because 78 is less than the board's 80.
@@ -123,7 +123,7 @@ The real state behind this run is in [`demo-state/`](demo-state/): see [`demo-st
 - **Pulse board**: 1 ideation, 1 refinement, 1 spec (validated → in_progress), 1 active sprint, 4 cards: 2 `done`, 1 `rejected`, 1 `not_started`
 - **The full validated spec**: every functional requirement, technical requirement, acceptance criterion, business rule, the API contract, and the formal Decision entity, each linked to a real task card
 - **The real Nexus handoff**: `handoff_create` → `handoff_claim` → `handoff_complete`, with the actual contract-refinement result payload the frontend agent reported back
-- **The registered Nexus agent roster**: `spec-agent`, `backend-agent`, `frontend-agent`, `validator-agent`
+- **The registered Nexus agent roster**: `spec-agent`, `backend-agent`, `frontend-agent`, `validator-agent`, plus `local-agent` (session fallback identity)
 
 **Pulse: Ideation and Refinement, both done.** Scope evaluated (Domains 2, Dependencies 1), ambiguity-killer Q&A resolved on the left; the real codebase investigation that superseded three of the ideation's assumptions on the right.
 
@@ -315,7 +315,7 @@ open http://127.0.0.1:8202    # Nexus dashboard
 | 0. Setup | Fork, scaffold, bring up Plane's stack, register Pulse/Nexus agent identities | `scripts/00_setup.sh` |
 | 1. Ideate | Ambiguity-killer Q&A before writing anything down | `docs/prompts/01-ideation-ambiguity-killer.md` |
 | 2. Refine | Real codebase investigation informs the design | `docs/prompts/02-refinement-investigation.md`, `docs/decisions/01-ideation-refined-by-investigation.md` |
-| 3. Spec | Authored, KG-checked, pushed through the five-dimension validation gate, passes at 85/86/84/85/18 | - |
+| 3. Spec | Authored, KG-checked, pushed through the five-dimension validation gate, passes across Completeness (85 ≥ 70), Granularity (86 ≥ 80), Coherence (84 ≥ 80), Test Quality (85 ≥ 80), and Ambiguity (18 ≤ 30) | - |
 | 4. Sprint | 4 cards created and dependency-linked | - |
 | 5. Backend implementation | Real code, real tests, card reaches `done` | - |
 | 6. Handoff | Backend → frontend, contract artifact | `docs/prompts/03-nexus-handoff-payload.md` |

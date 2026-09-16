@@ -606,7 +606,7 @@ def main():
     backend_card = p.call("okto_pulse_move_card", dict(
         board_id=board, card_id=card_backend, status="validation",
         conclusion="Implemented rich_filters validation and application in ExportIssuesEndpoint/issue_export_task. "
-                   "17/17 pytest passed.",
+                   "7/7 pytest passed.",
         completeness=100, completeness_justification="All FRs/TRs for the backend card implemented and tested.",
         drift=0, drift_justification="Implementation matches the spec exactly, no deviation from plan.",
     ))["data"]["card"]
@@ -614,7 +614,7 @@ def main():
     p.call("okto_pulse_submit_task_validation", dict(
         board_id=board, card_id=card_backend, expected_subject_version=backend_card["subject_version"],
         idempotency_key=f"seed-tv-backend-{uuid.uuid4().hex[:12]}",
-        confidence=92, confidence_justification="Real pytest run against the actual endpoint, 17/17 passed.",
+        confidence=92, confidence_justification="Real pytest run against the actual endpoint, 7/7 passed.",
         estimated_completeness=100, completeness_justification="All linked FRs/TRs/BRs implemented and verified.",
         estimated_drift=0, drift_justification="No deviation from the validated spec.",
         general_justification="Backend implementation matches the contract; tests pass against real infrastructure.",
@@ -631,7 +631,7 @@ def main():
     p.call("okto_pulse_move_card", dict(
         board_id=board, card_id=card_backend_test, status="done",
         conclusion="Wrote apps/api/plane/tests/contract/app/test_export_issues_rich_filters_app.py covering filter "
-                   "application, invalid-key rejection, and legacy backward compatibility. 17/17 pytest passed. All "
+                   "application, invalid-key rejection, and legacy backward compatibility. 7/7 pytest passed. All "
                    "3 linked test scenarios marked passed with automated_test_pointer evidence.",
         completeness=100, completeness_justification="All 3 linked test scenarios implemented and passing.",
         drift=0, drift_justification="Test coverage matches the spec exactly.",
