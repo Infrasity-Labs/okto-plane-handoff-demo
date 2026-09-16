@@ -24,15 +24,15 @@ Ideation (initial scope, pre-code-read)
 Refinement (real codebase investigation) ──► informs 3 design decisions
    │
    ▼
-Spec (validated: 85/86/84/85/18, all coverage 100%)
+Spec (validated: Completeness 85/70, Granularity 86/80, Coherence 84/80, Test Quality 85/80, Ambiguity 18/30, all coverage 100%)
    │
    ▼
 Sprint (4 cards, dependency-linked)
    │
-   ├─► Backend card ──► done (17 passing tests, run live)
+   ├─► Backend card ──► done (7 passing pytest tests, run live)
    │        │
    │        ▼
-   │   Nexus handoff: backend-agent → frontend-agent
+   │   Nexus handoff: local-agent (session fallback) → frontend-agent
    │   (API contract as artifact, real create/claim/complete trail)
    │        │
    │        ▼
